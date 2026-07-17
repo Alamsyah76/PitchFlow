@@ -93,45 +93,16 @@ export default function AgenticProgress({ documentId, isActive, onComplete, onEr
   if (!isActive) return null
 
   return (
-    <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      {/* Progress bar */}
+    <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="h-2 overflow-hidden rounded-full bg-slate-100">
         <div
-          className={`h-full rounded-full bg-gradient-to-r from-blue-500 via-emerald-500 to-violet-500 transition-all duration-500 ease-out`}
+          className={`h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500 ease-out`}
           style={{ width: `${currentProgress}%` }}
         />
       </div>
-
-      {/* Current step */}
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-slate-400">{currentProgress}%</span>
+      <div className="flex items-center gap-2 text-xs text-slate-500">
         <span className="font-medium text-slate-700">{currentMessage}</span>
-      </div>
-
-      {/* Agent timeline */}
-      <div className="flex gap-2">
-        {['Strategy', 'Data', 'Reporting', 'Complete'].map((agent) => {
-          const done = events.some((e) => e.agent === agent && e.status === 'done')
-          const active = events.some((e) => e.agent === agent && e.status === 'running') && !done
-          return (
-            <div
-              key={agent}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
-                done
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : active
-                  ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
-                  : 'bg-slate-50 text-slate-400'
-              }`}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${
-                done ? 'bg-emerald-500' : active ? 'bg-blue-500 animate-pulse' : 'bg-slate-300'
-              }`} />
-              {AGENT_LABELS[agent] || agent}
-              {done && ' ✓'}
-            </div>
-          )
-        })}
+        <span>{currentProgress}%</span>
       </div>
     </div>
   )
