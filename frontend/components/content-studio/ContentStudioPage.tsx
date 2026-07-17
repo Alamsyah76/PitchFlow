@@ -597,15 +597,6 @@ export default function ContentStudioPage() {
             onChooseFile={() => fileInputRef.current?.click()}
             onGenerateTopics={handleGenerateTopics}
           />
-          {/* Agentic RAG Status */}
-          <div className="px-3 md:px-4">
-            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5">
-              <span className={`h-2.5 w-2.5 rounded-full ${selectedFile || uploadedDocument ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-              <span className="text-xs font-medium text-slate-600">
-                Agentic RAG {selectedFile || uploadedDocument ? 'Active' : 'Ready'}
-              </span>
-            </div>
-          </div>
           </div>
 
           {hasTopics && (
