@@ -42,8 +42,8 @@ export default function TemplateList({ templates, activeTplId, onActivate, onEdi
               className={`flex items-center justify-between px-5 py-3.5 transition-colors ${
                 t.id === activeTplId ? 'bg-blue-50/40' : 'hover:bg-slate-50'
               }`}>
-              <div className="flex items-center gap-3.5">
-                <div className={`flex h-6 w-6 items-center justify-center rounded-md border-2 transition-colors cursor-pointer ${
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors cursor-pointer ${
                   t.id === activeTplId
                     ? 'border-[#0056b3] bg-[#0056b3]'
                     : 'border-slate-300 hover:border-slate-400'
@@ -52,9 +52,9 @@ export default function TemplateList({ templates, activeTplId, onActivate, onEdi
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                   )}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-900">{t.title}</span>
+                    <span className="truncate text-sm font-medium text-slate-900">{t.title}</span>
                     {t.id === activeTplId && (
                       <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">Active</span>
                     )}
@@ -62,13 +62,22 @@ export default function TemplateList({ templates, activeTplId, onActivate, onEdi
                   <p className="mt-0.5 text-xs text-slate-400">{t.subject || 'No subject'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button onClick={() => onView(t)}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">View</button>
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-[0.95] whitespace-nowrap">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  View
+                </button>
                 <button onClick={() => onEdit(t)}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">Edit</button>
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-[0.95] whitespace-nowrap">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </button>
                 <button onClick={() => onDelete(t.id)}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-50 hover:text-red-600">Delete</button>
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-red-400 shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.95] whitespace-nowrap">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  Delete
+                </button>
               </div>
             </div>
           ))}

@@ -108,10 +108,10 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm table-fixed">
               <thead>
                 <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  <th className="sticky top-0 bg-white px-4 py-3.5">
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-10">
                   <input type="checkbox"
                     checked={(()=>{
                       const limit=Math.min(status?.daily_limit||contacts.length, contacts.length)
@@ -124,11 +124,11 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
                     onChange={onSelectAll}
                     className="accent-[#0056b3] h-4 w-4 rounded border-slate-300" />
                   </th>
-                  <th className="sticky top-0 bg-white px-4 py-3.5">Name</th>
-                  <th className="sticky top-0 bg-white px-4 py-3.5">Email</th>
-                  <th className="sticky top-0 bg-white px-4 py-3.5">Company</th>
-                  <th className="sticky top-0 bg-white px-4 py-3.5">Status</th>
-                  <th className="sticky top-0 bg-white px-4 py-3.5"></th>
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-[160px] min-w-[120px]">Name</th>
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-[160px] min-w-[120px]">Email</th>
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-[140px] min-w-[100px]">Company</th>
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-20">Status</th>
+                  <th className="sticky top-0 bg-white px-4 py-3.5 w-40"></th>
                 </tr>
               </thead>
               <tbody>
@@ -136,9 +136,9 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
                   const origIdx = contacts.indexOf(c);
                   return <tr key={origIdx} className={`border-b border-slate-50 transition-colors ${selectedIdx.has(origIdx) ? 'bg-blue-50/40' : 'hover:bg-slate-50'}`}>
                     <td className="px-4 py-3.5"><input type="checkbox" checked={selectedIdx.has(origIdx)} onChange={() => onToggle(origIdx)} className="accent-[#0056b3] h-4 w-4 rounded border-slate-300" /></td>
-                    <td className="px-4 py-3.5 font-medium text-slate-900">{c.name}</td>
-                    <td className="px-4 py-3.5 text-slate-600">{c.email}</td>
-                    <td className="px-4 py-3.5 text-slate-500">{c.company}</td>
+                    <td className="px-4 py-3.5 font-medium text-slate-900 truncate max-w-[200px]">{c.name}</td>
+                    <td className="px-4 py-3.5 text-slate-600 truncate max-w-[250px]">{c.email}</td>
+                    <td className="px-4 py-3.5 text-slate-500 truncate max-w-[180px]">{c.company}</td>
                     <td className="px-4 py-3.5">
                       {c.status === 'sent' ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
@@ -152,15 +152,15 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <button onClick={() => onEdit(origIdx, c)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-[0.95]">
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-[0.95] whitespace-nowrap">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                           Edit
                         </button>
                         <button onClick={() => onDelete(c.email)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-red-400 shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.95]">
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-red-400 shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.95] whitespace-nowrap">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                           Delete
                         </button>
