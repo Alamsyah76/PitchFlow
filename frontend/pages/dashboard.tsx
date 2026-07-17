@@ -1,0 +1,313 @@
+'use client'
+import AppShell from '../components/app-shell/AppShell'
+import { useEffect, useState } from 'react'
+import {
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, Legend,
+} from 'recharts'
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8042'
+
+const COLORS = {
+  primary: '#F48120',
+  success: '#22C55E',
+  danger: '#EF4444',
+  warning: '#F59E0B',
+  slate: '#94A3B8',
+  dark: '#1E293B',
+  light: '#F1F5F9',
+}
+
+const PIE_COLORS = ['#22C55E', '#F48120', '#EF4444', '#94A3B8']
+
+interface Summary {
+  total_sent: number; total_failed: number; today_sent: number; today_failed: number
+  total_opens: number; unique_opens: number; open_rate: number
+  total_contacts: number; pending: number; blog_posts_sent: number
+  last_checked: string
+}
+
+interface TimelineDay { date: string; sent: number; failed: number; opens: number; unique_opens: number }
+interface Activity { timestamp: string; email: string; name: string; status: string; error: string }
+
+export default function DashboardRoute() {
+  const [summary, setSummary] = useState<Summary | null>(null)
+  const [timeline, setTimeline] = useState<TimelineDay[]>([])
+  const [activities, setActivities] = useState<Activity[]>([])
+  const [loading, setLoading] = useState(true)
+  const [range, setRange] = useState<7 | 14 | 30>(30)
+
+  useEffect(() => {
+    fetchAll()
+  }, [range])
+
+  async function fetchAll() {
+    setLoading(true)
+    try {
+      const [sumRes, timeRes, actRes] = await Promise.all([
+        fetch(`${API}/api/email-campaign/report/summary`),
+        fetch(`${API}/api/email-campaign/report/timeline?days=${range}`),
+        fetch(`${API}/api/email-campaign/report/recent-activity?limit=8`),
+      ])
+      const [sumData, timeData, actData] = await Promise.all([
+        sumRes.json(), timeRes.json(), actRes.json(),
+      ])
+      if (sumData.success) setSummary(sumData.data)
+      if (timeData.success) setTimeline(timeData.data.timeline)
+      if (actData.success) setActivities(actData.data)
+    } catch (e) {
+      console.error('Dashboard fetch error:', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const sentVsPending = summary ? [
+    { name: 'Sent', value: summary.total_sent },
+    { name: 'Pending', value: Math.max(0, summary.total_contacts - summary.total_sent) },
+    { name: 'Failed', value: summary.total_failed },
+    { name: 'Open (unique)', value: summary.unique_opens },
+  ] : []
+
+  function fmt(n: number) { return n.toLocaleString('en-US') }
+
+  if (loading && !summary) {
+    return (
+      <AppShell activeRoute="/dashboard">
+        <div className="flex h-[70vh] items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#F48120] border-t-transparent" />
+            <p className="text-sm text-slate-500">Loading dashboard...</p>
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell activeRoute="/dashboard">
+      <div className="mx-auto max-w-7xl space-y-6 p-6">
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+            <p className="mt-1 text-sm text-slate-500">Email Campaign performance &amp; analytics</p>
+          </div>
+          <button
+            onClick={fetchAll}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            Refresh
+          </button>
+        </div>
+
+        {/* ── KPI Cards ── */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard
+            title="Total Sent"
+            value={fmt(summary?.total_sent || 0)}
+            subtitle={`${summary?.today_sent || 0} today`}
+            color={COLORS.success}
+            icon={<SentIcon />}
+          />
+          <KpiCard
+            title="Open Rate"
+            value={`${summary?.open_rate || 0}%`}
+            subtitle={`${summary?.unique_opens || 0} unique opens`}
+            color={COLORS.primary}
+            icon={<OpenIcon />}
+          />
+          <KpiCard
+            title="Total Contacts"
+            value={fmt(summary?.total_contacts || 0)}
+            subtitle={`${summary?.pending || 0} pending`}
+            color={COLORS.dark}
+            icon={<ContactIcon />}
+          />
+          <KpiCard
+            title="Blog Posts"
+            value={fmt(summary?.blog_posts_sent || 0)}
+            subtitle={`Last checked: ${summary?.last_checked?.split('T')[0] || 'never'}`}
+            color={COLORS.warning}
+            icon={<BlogIcon />}
+          />
+        </div>
+
+        {/* ── Two-column charts ── */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Line Chart: Daily Sends */}
+          <ChartCard title="📈 Daily Sends" subtitle="Last 30 days" className="lg:col-span-2">
+            <div className="mb-3 flex gap-2">
+              {([7, 14, 30] as const).map(d => (
+                <button
+                  key={d}
+                  onClick={() => setRange(d)}
+                  className={`rounded-md px-3 py-1 text-xs font-medium transition ${
+                    range === d
+                      ? 'bg-[#F48120] text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
+              <AreaChart data={timeline}>
+                <defs>
+                  <linearGradient id="sentGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} stroke="#94A3B8" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8" allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  labelFormatter={d => `Date: ${d}`}
+                />
+                <Area type="monotone" dataKey="sent" stroke={COLORS.primary} fill="url(#sentGrad)" strokeWidth={2} name="Sent" />
+                <Line type="monotone" dataKey="opens" stroke={COLORS.success} strokeWidth={2} dot={false} name="Opens" strokeDasharray="4 4" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          {/* Donut: Sent vs Pending */}
+          <ChartCard title="🥧 Campaign Overview" subtitle="Distribution">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={sentVsPending}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {sentVsPending.map((_, i) => (
+                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0' }}
+                  formatter={(value: any, name: any) => [fmt(Number(value) || 0), name]}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  iconSize={8}
+                  formatter={(value: string) => <span className="text-xs text-slate-600">{value}</span>}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        {/* ── Bar Chart: Daily Failed vs Sent (stacked) ── */}
+        <ChartCard title="📊 Send Performance" subtitle="Green = success, Red = failed">
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={timeline.slice(-14)}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} stroke="#94A3B8" />
+              <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8" allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0' }}
+                labelFormatter={d => `Date: ${d}`}
+              />
+              <Bar dataKey="sent" stackId="a" fill={COLORS.success} name="Sent" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="failed" stackId="a" fill={COLORS.danger} name="Failed" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* ── Recent Activity ── */}
+        <ChartCard title="📋 Recent Activity" subtitle="Last 8 sends">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-xs uppercase text-slate-500">
+                  <th className="pb-2 pr-4 font-medium">Time</th>
+                  <th className="pb-2 pr-4 font-medium">Name</th>
+                  <th className="pb-2 pr-4 font-medium">Email</th>
+                  <th className="pb-2 pr-4 font-medium">Status</th>
+                  <th className="pb-2 font-medium">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activities.length === 0 ? (
+                  <tr><td colSpan={5} className="py-8 text-center text-sm text-slate-400">No activity yet</td></tr>
+                ) : activities.map((a, i) => (
+                  <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="py-2.5 pr-4 text-xs text-slate-500 whitespace-nowrap">{a.timestamp?.slice(11, 19)}</td>
+                    <td className="py-2.5 pr-4 font-medium text-slate-700">{a.name || '-'}</td>
+                    <td className="py-2.5 pr-4 text-slate-600">{a.email}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                        a.status === 'sent' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {a.status === 'sent' ? '✅ Sent' : '❌ Failed'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 text-xs text-slate-400 max-w-[200px] truncate">{a.error || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </ChartCard>
+      </div>
+    </AppShell>
+  )
+}
+
+// ── Sub-components ──
+
+function KpiCard({ title, value, subtitle, color, icon }: {
+  title: string; value: string; subtitle: string; color: string; icon: React.ReactNode
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500">{title}</p>
+          <p className="mt-1.5 text-2xl font-bold text-slate-900">{value}</p>
+          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: color + '15' }}>
+          <div style={{ color }}>{icon}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ChartCard({ title, subtitle, children, className = '' }: {
+  title: string; subtitle?: string; children: React.ReactNode; className?: string
+}) {
+  return (
+    <div className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>
+      <div className="mb-3">
+        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+// ── Icons ──
+function SentIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+}
+function OpenIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+}
+function ContactIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+}
+function BlogIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+}

@@ -1,0 +1,109 @@
+{
+  "parser": "legacy_fallback",
+  "success": false,
+  "document_id": "d07d9e91-74be-4843-abc3-bce2960198c9",
+  "pages": [
+    {
+      "page_number": 1,
+      "markdown": "\"High Availability (HA) & Data Sync Module\" & \"POC prerequisites  for SQ Alert \nPlus\" for your end to run in any LLM to learn more  : \n \nTheme: Installation / Setup  \n \nQuestion: Can setup of High Availability (HA) / Clustering in 2 different physical locations - focus \non HA & Data Sync Module?  \nAnswer: HA solution does not apply when two sites are of two different networks linked by a \nleased line and no VPN. Both are in different subnets but connected: cannot use  HA, but use data \nsync . This means both are running independently, but data is synced in real -time. So, the \napplication can send to 1 system and load balance to another, possibly using a load balancer for \nauto -distribution.  \n SMS message sending by primary will be copied over secondary, and both sides will have the \nsame data in usage logs. The setup has to be in the same subnet mask range for the heartbeat \nconnection for Eth -1. SendQuick HA failover on VM will take about 5 -6 se conds. Refer to the \nYouTube link below: https://youtu.be/Dn8v1eB62t4 . Alerts will be lost in 5 seconds since there \nwas no package drop in the ping check.",
+      "text": "\"High Availability (HA) & Data Sync Module\" & \"POC prerequisites  for SQ Alert \nPlus\" for your end to run in any LLM to learn more  : \n \nTheme: Installation / Setup  \n \nQuestion: Can setup of High Availability (HA) / Clustering in 2 different physical locations - focus \non HA & Data Sync Module?  \nAnswer: HA solution does not apply when two sites are of two different networks linked by a \nleased line and no VPN. Both are in different subnets but connected: cannot use  HA, but use data \nsync . This means both are running independently, but data is synced in real -time. So, the \napplication can send to 1 system and load balance to another, possibly using a load balancer for \nauto -distribution.  \n SMS message sending by primary will be copied over secondary, and both sides will have the \nsame data in usage logs. The setup has to be in the same subnet mask range for the heartbeat \nconnection for Eth -1. SendQuick HA failover on VM will take about 5 -6 se conds. Refer to the \nYouTube link below: https://youtu.be/Dn8v1eB62t4 . Alerts will be lost in 5 seconds since there \nwas no package drop in the ping check.",
+      "headings": [
+        "Theme: Installation / Setup",
+        "SMS message sending by primary will be copied over secondary, and both sides will have the"
+      ],
+      "tables": [],
+      "images_or_figures": [],
+      "raw_blocks": [
+        {
+          "page_number": 1,
+          "section_heading": "Theme: Installation / Setup",
+          "block_type": "paragraph",
+          "text": "\"High Availability (HA) & Data Sync Module\" & \"POC prerequisites  for SQ Alert \nPlus\" for your end to run in any LLM to learn more  :"
+        },
+        {
+          "page_number": 1,
+          "section_heading": "Theme: Installation / Setup",
+          "block_type": "heading",
+          "text": "Theme: Installation / Setup"
+        },
+        {
+          "page_number": 1,
+          "section_heading": "Theme: Installation / Setup",
+          "block_type": "paragraph",
+          "text": "Question: Can setup of High Availability (HA) / Clustering in 2 different physical locations - focus \non HA & Data Sync Module?  \nAnswer: HA solution does not apply when two sites are of two different networks linked by a \nleased line and no VPN. Both are in different subnets but connected: cannot use  HA, but use data \nsync . This means both are running independently, but data is synced in real -time. So, the \napplication can send to 1 system and load balance to another, possibly using a load balancer for \nauto -distribution.  \n SMS message sending by primary will be copied over secondary, and both sides will have the \nsame data in usage logs. The setup has to be in the same subnet mask range for the heartbeat \nconnection for Eth -1. SendQuick HA failover on VM will take about 5 -6 se conds. Refer to the \nYouTube link below: https://youtu.be/Dn8v1eB62t4 . Alerts will be lost in 5 seconds since there \nwas no package drop in the ping check."
+        }
+      ],
+      "raw": {}
+    },
+    {
+      "page_number": 2,
+      "markdown": "HA can be done with the following conditions - video guide here on HA \nsetup:  https://youtu.be/4pSjw -hyD0M?si=TEdNYNeOuKXqw7OV  or past PDF guide here: \nhttps://www.talariax.com/wp -content/uploads/2018/04/sendQuickHA.pdf -9.pdf :  \n  \nOption 1:  With 2 different locations, the customer can patch a cross cable directly from location \nA to location B from the Patch Panels. SendQuick HA using Eth -1 via a cross -cable direct \nconnection will work with both primary and secondary SendQuick server s in the same IP range \nand subnet mask.  \n  \nOption 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects",
+      "text": "HA can be done with the following conditions - video guide here on HA \nsetup:  https://youtu.be/4pSjw -hyD0M?si=TEdNYNeOuKXqw7OV  or past PDF guide here: \nhttps://www.talariax.com/wp -content/uploads/2018/04/sendQuickHA.pdf -9.pdf :  \n  \nOption 1:  With 2 different locations, the customer can patch a cross cable directly from location \nA to location B from the Patch Panels. SendQuick HA using Eth -1 via a cross -cable direct \nconnection will work with both primary and secondary SendQuick server s in the same IP range \nand subnet mask.  \n  \nOption 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects",
+      "headings": [
+        "HA can be done with the following conditions - video guide here on HA"
+      ],
+      "tables": [],
+      "images_or_figures": [
+        {
+          "page_number": 2,
+          "section_heading": "HA can be done with the following conditions - video guide here on HA",
+          "block_type": "figure_caption",
+          "text": "Option 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects"
+        }
+      ],
+      "raw_blocks": [
+        {
+          "page_number": 2,
+          "section_heading": "HA can be done with the following conditions - video guide here on HA",
+          "block_type": "paragraph",
+          "text": "HA can be done with the following conditions - video guide here on HA \nsetup:  https://youtu.be/4pSjw -hyD0M?si=TEdNYNeOuKXqw7OV  or past PDF guide here: \nhttps://www.talariax.com/wp -content/uploads/2018/04/sendQuickHA.pdf -9.pdf :"
+        },
+        {
+          "page_number": 2,
+          "section_heading": "HA can be done with the following conditions - video guide here on HA",
+          "block_type": "paragraph",
+          "text": "Option 1:  With 2 different locations, the customer can patch a cross cable directly from location \nA to location B from the Patch Panels. SendQuick HA using Eth -1 via a cross -cable direct \nconnection will work with both primary and secondary SendQuick server s in the same IP range \nand subnet mask."
+        },
+        {
+          "page_number": 2,
+          "section_heading": "HA can be done with the following conditions - video guide here on HA",
+          "block_type": "figure_caption",
+          "text": "Option 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects"
+        }
+      ],
+      "raw": {}
+    },
+    {
+      "page_number": 3,
+      "markdown": "that the primary one is down, it will automatically take over and assume the primary IP address \nand configuration. So, all devices (e.g., monitoring tools, etc) still point to the primary SendQuick \nserver IP address.  \n \n Question: If a POC of SQ Alert Plus is needed   – Filter Rule -what’s required?  \nPls configure those in their device:  \n·       SMTP (FQDN) : entera2.sendquickasp.com  \n·       SMTP (IP)   : 182.23.145.23  \n·       Send To : ecmsthet@entera2.sendquickasp.com  \nProvide a sender email, mobile number (with country code) to whitelist in SendQuick. Provide \nalso the alert message content (with parameters) to receive.",
+      "text": "that the primary one is down, it will automatically take over and assume the primary IP address \nand configuration. So, all devices (e.g., monitoring tools, etc) still point to the primary SendQuick \nserver IP address.  \n \n Question: If a POC of SQ Alert Plus is needed   – Filter Rule -what’s required?  \nPls configure those in their device:  \n·       SMTP (FQDN) : entera2.sendquickasp.com  \n·       SMTP (IP)   : 182.23.145.23  \n·       Send To : ecmsthet@entera2.sendquickasp.com  \nProvide a sender email, mobile number (with country code) to whitelist in SendQuick. Provide \nalso the alert message content (with parameters) to receive.",
+      "headings": [
+        "Pls configure those in their device:"
+      ],
+      "tables": [],
+      "images_or_figures": [],
+      "raw_blocks": [
+        {
+          "page_number": 3,
+          "section_heading": "Pls configure those in their device:",
+          "block_type": "paragraph",
+          "text": "that the primary one is down, it will automatically take over and assume the primary IP address \nand configuration. So, all devices (e.g., monitoring tools, etc) still point to the primary SendQuick \nserver IP address."
+        },
+        {
+          "page_number": 3,
+          "section_heading": "Pls configure those in their device:",
+          "block_type": "paragraph",
+          "text": "Question: If a POC of SQ Alert Plus is needed   – Filter Rule -what’s required?  \nPls configure those in their device:  \n·       SMTP (FQDN) : entera2.sendquickasp.com  \n·       SMTP (IP)   : 182.23.145.23  \n·       Send To : ecmsthet@entera2.sendquickasp.com  \nProvide a sender email, mobile number (with country code) to whitelist in SendQuick. Provide \nalso the alert message content (with parameters) to receive."
+        }
+      ],
+      "raw": {}
+    }
+  ],
+  "full_markdown": "\"High Availability (HA) & Data Sync Module\" & \"POC prerequisites  for SQ Alert \nPlus\" for your end to run in any LLM to learn more  : \n \nTheme: Installation / Setup  \n \nQuestion: Can setup of High Availability (HA) / Clustering in 2 different physical locations - focus \non HA & Data Sync Module?  \nAnswer: HA solution does not apply when two sites are of two different networks linked by a \nleased line and no VPN. Both are in different subnets but connected: cannot use  HA, but use data \nsync . This means both are running independently, but data is synced in real -time. So, the \napplication can send to 1 system and load balance to another, possibly using a load balancer for \nauto -distribution.  \n SMS message sending by primary will be copied over secondary, and both sides will have the \nsame data in usage logs. The setup has to be in the same subnet mask range for the heartbeat \nconnection for Eth -1. SendQuick HA failover on VM will take about 5 -6 se conds. Refer to the \nYouTube link below: https://youtu.be/Dn8v1eB62t4 . Alerts will be lost in 5 seconds since there \nwas no package drop in the ping check.\n\nHA can be done with the following conditions - video guide here on HA \nsetup:  https://youtu.be/4pSjw -hyD0M?si=TEdNYNeOuKXqw7OV  or past PDF guide here: \nhttps://www.talariax.com/wp -content/uploads/2018/04/sendQuickHA.pdf -9.pdf :  \n  \nOption 1:  With 2 different locations, the customer can patch a cross cable directly from location \nA to location B from the Patch Panels. SendQuick HA using Eth -1 via a cross -cable direct \nconnection will work with both primary and secondary SendQuick server s in the same IP range \nand subnet mask.  \n  \nOption 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects\n\nthat the primary one is down, it will automatically take over and assume the primary IP address \nand configuration. So, all devices (e.g., monitoring tools, etc) still point to the primary SendQuick \nserver IP address.  \n \n Question: If a POC of SQ Alert Plus is needed   – Filter Rule -what’s required?  \nPls configure those in their device:  \n·       SMTP (FQDN) : entera2.sendquickasp.com  \n·       SMTP (IP)   : 182.23.145.23  \n·       Send To : ecmsthet@entera2.sendquickasp.com  \nProvide a sender email, mobile number (with country code) to whitelist in SendQuick. Provide \nalso the alert message content (with parameters) to receive.",
+  "full_text": "\"High Availability (HA) & Data Sync Module\" & \"POC prerequisites  for SQ Alert \nPlus\" for your end to run in any LLM to learn more  : \n \nTheme: Installation / Setup  \n \nQuestion: Can setup of High Availability (HA) / Clustering in 2 different physical locations - focus \non HA & Data Sync Module?  \nAnswer: HA solution does not apply when two sites are of two different networks linked by a \nleased line and no VPN. Both are in different subnets but connected: cannot use  HA, but use data \nsync . This means both are running independently, but data is synced in real -time. So, the \napplication can send to 1 system and load balance to another, possibly using a load balancer for \nauto -distribution.  \n SMS message sending by primary will be copied over secondary, and both sides will have the \nsame data in usage logs. The setup has to be in the same subnet mask range for the heartbeat \nconnection for Eth -1. SendQuick HA failover on VM will take about 5 -6 se conds. Refer to the \nYouTube link below: https://youtu.be/Dn8v1eB62t4 . Alerts will be lost in 5 seconds since there \nwas no package drop in the ping check.\n\nHA can be done with the following conditions - video guide here on HA \nsetup:  https://youtu.be/4pSjw -hyD0M?si=TEdNYNeOuKXqw7OV  or past PDF guide here: \nhttps://www.talariax.com/wp -content/uploads/2018/04/sendQuickHA.pdf -9.pdf :  \n  \nOption 1:  With 2 different locations, the customer can patch a cross cable directly from location \nA to location B from the Patch Panels. SendQuick HA using Eth -1 via a cross -cable direct \nconnection will work with both primary and secondary SendQuick server s in the same IP range \nand subnet mask.  \n  \nOption 2:  If a cross cable is NOT patched, then the customer can assign a static IP (in ETH -1) to \neach of the primary and secondary SendQuick servers. They must be in the same network range. \nFor example (based on the image below), IP range for Primary -eth1 = 10.1.1.11 and Secondary -\neth1 = 10.1.1.10. Both servers will PING each other. If the secondary SendQuick server detects\n\nthat the primary one is down, it will automatically take over and assume the primary IP address \nand configuration. So, all devices (e.g., monitoring tools, etc) still point to the primary SendQuick \nserver IP address.  \n \n Question: If a POC of SQ Alert Plus is needed   – Filter Rule -what’s required?  \nPls configure those in their device:  \n·       SMTP (FQDN) : entera2.sendquickasp.com  \n·       SMTP (IP)   : 182.23.145.23  \n·       Send To : ecmsthet@entera2.sendquickasp.com  \nProvide a sender email, mobile number (with country code) to whitelist in SendQuick. Provide \nalso the alert message content (with parameters) to receive.",
+  "parse_confidence": 0.45,
+  "errors": [
+    "LLAMA_CLOUD_API_KEY is missing"
+  ],
+  "legacy_total_pages": 3
+}

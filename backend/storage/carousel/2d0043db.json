@@ -1,0 +1,21 @@
+{
+  "carousel_id": "2d0043db",
+  "slides": 3,
+  "theme": {
+    "primary_hex": "#004B87",
+    "secondary_hex": "#A8C8E0",
+    "accent_hex": "#FFB300",
+    "bg_style": "gradient",
+    "visual_concept": "A professional and clean corporate theme that emphasizes reliability and efficiency. The gradient background transitions from a deep blue to a soft light blue, symbolizing trust and stability. Dark text provides clarity and readability, while the accent color highlights key features and calls to action, making the carousel visually engaging and informative."
+  },
+  "image_paths": [
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\2d0043db_slide_1.jpg",
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\2d0043db_slide_2.jpg",
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\2d0043db_slide_3.jpg"
+  ],
+  "image_urls": [
+    "/storage/carousel/2d0043db_slide_1.jpg",
+    "/storage/carousel/2d0043db_slide_2.jpg",
+    "/storage/carousel/2d0043db_slide_3.jpg"
+  ]
+}

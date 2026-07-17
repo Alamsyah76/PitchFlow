@@ -1,0 +1,33 @@
+{
+  "parser": "legacy_fallback",
+  "success": false,
+  "document_id": "c2d53632-c088-4adc-9697-aa64f9e92b67",
+  "pages": [
+    {
+      "page_number": 1,
+      "markdown": "Digital Infrastructure Solutions\nDigital infrastructure powers business operations: data centers, cloud, network, and edge computing.\nOur platform provides end-to-end IT asset management with dashboards for power, cooling, and network.\nEnvironmental sensors monitor temperature and humidity. Alerts notify teams before equipment failure.\nNetwork management covers bandwidth utilization and capacity planning with SNMP integration.",
+      "text": "Digital Infrastructure Solutions\nDigital infrastructure powers business operations: data centers, cloud, network, and edge computing.\nOur platform provides end-to-end IT asset management with dashboards for power, cooling, and network.\nEnvironmental sensors monitor temperature and humidity. Alerts notify teams before equipment failure.\nNetwork management covers bandwidth utilization and capacity planning with SNMP integration.",
+      "headings": [
+        "Digital Infrastructure Solutions"
+      ],
+      "tables": [],
+      "images_or_figures": [],
+      "raw_blocks": [
+        {
+          "page_number": 1,
+          "section_heading": "Digital Infrastructure Solutions",
+          "block_type": "paragraph",
+          "text": "Digital Infrastructure Solutions\nDigital infrastructure powers business operations: data centers, cloud, network, and edge computing.\nOur platform provides end-to-end IT asset management with dashboards for power, cooling, and network.\nEnvironmental sensors monitor temperature and humidity. Alerts notify teams before equipment failure.\nNetwork management covers bandwidth utilization and capacity planning with SNMP integration."
+        }
+      ],
+      "raw": {}
+    }
+  ],
+  "full_markdown": "Digital Infrastructure Solutions\nDigital infrastructure powers business operations: data centers, cloud, network, and edge computing.\nOur platform provides end-to-end IT asset management with dashboards for power, cooling, and network.\nEnvironmental sensors monitor temperature and humidity. Alerts notify teams before equipment failure.\nNetwork management covers bandwidth utilization and capacity planning with SNMP integration.",
+  "full_text": "Digital Infrastructure Solutions\nDigital infrastructure powers business operations: data centers, cloud, network, and edge computing.\nOur platform provides end-to-end IT asset management with dashboards for power, cooling, and network.\nEnvironmental sensors monitor temperature and humidity. Alerts notify teams before equipment failure.\nNetwork management covers bandwidth utilization and capacity planning with SNMP integration.",
+  "parse_confidence": 0.45,
+  "errors": [
+    "LlamaParse SDK import failed: No module named 'llama_cloud'"
+  ],
+  "legacy_total_pages": 1
+}

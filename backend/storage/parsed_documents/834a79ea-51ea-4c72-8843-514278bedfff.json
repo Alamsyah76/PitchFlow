@@ -1,0 +1,39 @@
+{
+  "parser": "legacy_fallback",
+  "success": false,
+  "document_id": "834a79ea-51ea-4c72-8843-514278bedfff",
+  "pages": [
+    {
+      "page_number": 1,
+      "markdown": "SendQuick’ AlertPlus\nooo\n= —- et ~ AG\n4 .-* Modem\naar\nNetwork Infrastructure\na ™ = oz\nBack Up Power (UPS) EMS, NMS, DCIM\n. Management Systems System\nSocial Messengers and Firewall &e\nCollaboration Tools = Applications\nsoO0e\nst. Gi w Router an\n—3> 1\" Database © CRM/ERP/POS Supply Chain\nServers Accounting Systems Management Systems\neh i y, Security\n(SE) 5 Intrusion Anti Virus Network Security Event\nPrevention Servers Access & Incident\nBranch Office Internet Systems Management Management\nNetworks (SEIM)",
+      "text": "SendQuick’ AlertPlus\nooo\n= —- et ~ AG\n4 .-* Modem\naar\nNetwork Infrastructure\na ™ = oz\nBack Up Power (UPS) EMS, NMS, DCIM\n. Management Systems System\nSocial Messengers and Firewall &e\nCollaboration Tools = Applications\nsoO0e\nst. Gi w Router an\n—3> 1\" Database © CRM/ERP/POS Supply Chain\nServers Accounting Systems Management Systems\neh i y, Security\n(SE) 5 Intrusion Anti Virus Network Security Event\nPrevention Servers Access & Incident\nBranch Office Internet Systems Management Management\nNetworks (SEIM)",
+      "headings": [
+        "Network Infrastructure",
+        "Back Up Power (UPS) EMS, NMS, DCIM",
+        "Social Messengers and Firewall &e",
+        "Servers Accounting Systems Management Systems",
+        "Prevention Servers Access & Incident",
+        "Branch Office Internet Systems Management Management",
+        "Networks (SEIM)"
+      ],
+      "tables": [],
+      "images_or_figures": [],
+      "raw_blocks": [
+        {
+          "page_number": 1,
+          "section_heading": "Network Infrastructure",
+          "block_type": "paragraph",
+          "text": "SendQuick’ AlertPlus\nooo\n= —- et ~ AG\n4 .-* Modem\naar\nNetwork Infrastructure\na ™ = oz\nBack Up Power (UPS) EMS, NMS, DCIM\n. Management Systems System\nSocial Messengers and Firewall &e\nCollaboration Tools = Applications\nsoO0e\nst. Gi w Router an\n—3> 1\" Database © CRM/ERP/POS Supply Chain\nServers Accounting Systems Management Systems\neh i y, Security\n(SE) 5 Intrusion Anti Virus Network Security Event\nPrevention Servers Access & Incident\nBranch Office Internet Systems Management Management\nNetworks (SEIM)"
+        }
+      ],
+      "raw": {}
+    }
+  ],
+  "full_markdown": "SendQuick’ AlertPlus\nooo\n= —- et ~ AG\n4 .-* Modem\naar\nNetwork Infrastructure\na ™ = oz\nBack Up Power (UPS) EMS, NMS, DCIM\n. Management Systems System\nSocial Messengers and Firewall &e\nCollaboration Tools = Applications\nsoO0e\nst. Gi w Router an\n—3> 1\" Database © CRM/ERP/POS Supply Chain\nServers Accounting Systems Management Systems\neh i y, Security\n(SE) 5 Intrusion Anti Virus Network Security Event\nPrevention Servers Access & Incident\nBranch Office Internet Systems Management Management\nNetworks (SEIM)",
+  "full_text": "SendQuick’ AlertPlus\nooo\n= —- et ~ AG\n4 .-* Modem\naar\nNetwork Infrastructure\na ™ = oz\nBack Up Power (UPS) EMS, NMS, DCIM\n. Management Systems System\nSocial Messengers and Firewall &e\nCollaboration Tools = Applications\nsoO0e\nst. Gi w Router an\n—3> 1\" Database © CRM/ERP/POS Supply Chain\nServers Accounting Systems Management Systems\neh i y, Security\n(SE) 5 Intrusion Anti Virus Network Security Event\nPrevention Servers Access & Incident\nBranch Office Internet Systems Management Management\nNetworks (SEIM)",
+  "parse_confidence": 0.45,
+  "errors": [
+    "LlamaParse SDK import failed: No module named 'llama_cloud'"
+  ],
+  "legacy_total_pages": 1
+}

@@ -1,0 +1,201 @@
+================================================================================
+          PRODUCT REQUIREMENT DOCUMENT (PRD) - ENTERPRISE TECH STACK
+================================================================================
+Project Title   : AI-Driven Multi-Modal Content Engine & RAG SaaS
+Author          : AI Product Architect
+Target Engine   : 2026 AI Coding Agents (Codex, Cursor, VSCode Engineering)
+Document Version: 1.0 (Final Production Draft)
+Date            : May 2026
+================================================================================
+
+1. EXECUTIVE SUMMARY & BUSINESS OBJECTIVES
+--------------------------------------------------------------------------------
+1.1 Product Overview
+Sistem ini adalah mesin otomatisasi pembuatan konten B2B (Business-to-Business) 
+berbasis Full-Stack Web Application. Menggunakan teknologi Hybrid RAG (Retrieval-
+Augmented Generation), sistem mengekstrak informasi dari file PDF produk (brosur 
+pendek maupun whitepaper panjang berisi grafik/tabel), lalu mengubahnya menjadi 
+caption LinkedIn "Soft-selling" bernilai tinggi dengan tingkat validitas data 
+minimal 95%, bebas dari gaya tulisan robotik (Anti-AI-ish), serta mengonversinya 
+menjadi infografis LinkedIn Slide Carousel (3-5 halaman) dengan visual aset 
+dan elemen branding yang dinamis.
+
+1.2 Target User Personas
+- Pemilik Proyek Pribadi (Otomatisasi Alur Kerja Internal)
+- Tim Marketing Korporat B2B (Contoh: Produk SendQuick, IT Security, Cloud)
+- Social Media Agencies & Digital Marketers
+- UMKM / Pemilik Bisnis Mandiri
+- Content Creator Individual Profesional
+
+1.3 Key Value Proposition
+- Validitas Mutlak >= 95%: Sistem sensor evaluasi kebenaran data berlapis.
+- Anti-AI-ish Copywriting: Penyaringan otomatis kosakata klise buatan AI.
+- Ekstrem Token-Saving: Mengurangi biaya API hingga 85% menggunakan metode 
+  Context Caching, Advanced Chunking, dan Cohere Reranking.
+- Native Multi-Modal Carousel: Mengubah draf teks menjadi slide grafis siap pakai.
+
+
+2. ARCHITECTURE & TECHNOLOGY STACK (PRODUCTION ENVIRONMENT)
+--------------------------------------------------------------------------------
+Sistem harus dibangun menggunakan kombinasi komponen berikut (Wajib bagi Codex):
+
+- IDE / Editor       : VSCode (Dengan ekstensi Cursor / GitHub Copilot Agent)
+- Frontend           : Next.js (TypeScript, Tailwind CSS, Shadcn/ui)
+- Backend            : FastAPI (Python 3.11+)
+- Database / Auth    : Supabase (PostgreSQL)
+- Vector Extension   : pgvector (Terintegrasi di dalam database Supabase)
+- RAG Orchestrator   : LlamaIndex (Python)
+- Embedding Model    : OpenAI 'text-embedding-3-small' (Hemat biaya, akurasi tinggi)
+- Primary Drafting   : Google Gemini 1.5 Flash API (Mendukung Context Caching)
+- Auditor / Critic   : OpenAI GPT-4o API (Khusus evaluasi fakta akhir)
+- Local Engine       : Ollama (Menggunakan Llama3 / Mistral untuk testing lokal gratis)
+
+
+3. COMPONENT DETAILS: TOKEN-SAVING PIPELINE & DATA PROCESSING
+--------------------------------------------------------------------------------
+Untuk meminimalkan penggunaan token API komersial yang membengkak, sistem backend 
+wajib mengimplementasikan arsitektur data berikut:
+
+
+3.1 Advanced Chunking (LlamaIndex)
+Jangan memecah PDF berdasarkan jumlah karakter mentah. Gunakan 'Semantic Splitter' 
+dari LlamaIndex. PDF dipecah berdasarkan struktur paragraf dan tabel yang utuh 
+(Chunk size default: 512 token, overlap 10%). Setiap chunk harus ditempeli metadata 
+berupa Nama Dokumen, Tanggal, dan Judul Bab untuk mempercepat pencarian.
+
+3.2 Vector Storage (Supabase pgvector)
+Seluruh text chunk yang sudah diubah menjadi koordinat angka (vektor) disimpan secara 
+permanen di tabel `vector_store` di dalam Supabase menggunakan ekstensi `pgvector`. 
+- Taktik Token Saving: Jika pengguna menanyakan dokumen yang sama di kemudian hari, 
+  sistem TIDAK BOLEH melakukan embedding ulang atau membaca ulang PDF dari nol. 
+  Sistem langsung membaca koordinat dari Supabase pgvector.
+
+3.3 Cohere Rerank / BGE-Reranker Layer
+Ketika pengguna memilih topik, Vector DB mungkin mengembalikan 15-20 chunk dokumen 
+yang mirip. Mengirimkan semuanya ke Gemini/OpenAI akan memboroskan token.
+- Sistem wajib memasang lapisan Reranker (Contoh: Cohere Rerank API atau model 
+  Reranker lokal gratis via Ollama).
+- Reranker akan menyaring 20 chunk tersebut dan hanya mengambil TOP 3 CHUNK yang 
+  paling memiliki relevansi mutlak untuk dikirim ke LLM. Memotong konsumsi token 
+  hingga 70%.
+
+3.4 Gemini Context Caching
+Backend FastAPI harus dikonfigurasi untuk mengaktifkan fitur Context Caching pada 
+Gemini 1.5 Flash API jika dokumen PDF berukuran besar (>30.000 token). Token input 
+pada sesi chat yang sama akan disimpan di cache server Google selama 30 menit, 
+memotong biaya token input berulang hingga 85%.
+
+3.5 Large File Modularization & Distributed Processing (Penanganan File Besar)
+Untuk menghemat token secara radikal dan menghindari batasan limitasi memori (Rate Limits) saat pengguna mengunggah dokumen tebal (20-50 halaman), sistem backend FastAPI tidak boleh memproses dokumen sebagai satu kesatuan utuh. Sistem wajib menggunakan arsitektur modular:
+
+A. Distributed Ingestion (Modular Chunking):
+   - Dokumen besar dipecah di tingkat backend menjadi sub-dokumen berdasarkan struktur bab atau per kelompok halaman (misal: setiap 5 halaman menjadi 1 modul pemrosesan).
+   - Setiap modul dijalankan secara paralel (Asynchronous multi-threading) untuk diekstraksi teksnya oleh LlamaIndex, lalu disimpan ke pgvector secara bertahap menggunakan penanda ID unik: `module_chunk_id`.
+
+B. Hierarchical Summarization (Pembuatan Topik Bertingkat):
+   - Untuk membuat 3 topik utama di Kolom 2, AI tidak membaca seluruh isi PDF besar. 
+   - Sistem akan menyuruh Gemini 1.5 Flash membuat ringkasan mini (Summary Module) dari tiap-tiap sub-dokumen terlebih dahulu.
+   - Kumpulan ringkasan mini inilah yang kemudian digabungkan oleh AI untuk melahirkan 3 pilihan topik besar. Teknik modular ini menghemat penggunaan token input hingga 60% pada dokumen tebal.
+
+C. Target Retrieval (Pencarian Spesifik):
+   - Saat pengguna memilih satu topik, sistem hanya memanggil modul vektor yang relevan dengan topik tersebut dari database, bukan seluruh isi dokumen PDF, sehingga token yang dikirim ke LLM Generator di Kolom 3 tetap seminimal mungkin.
+
+
+4. DETAILED FUNCTIONAL REQUIREMENTS (THE USER WORKFLOW)
+--------------------------------------------------------------------------------
+Aplikasi menggunakan Layout Dashboard 3-Kolom Permanen di Next.js:
+
+[KOLOM 1: INPUT & SETTING] -> [KOLOM 2: TOPIC & VALIDATION] -> [KOLOM 3: EDITOR & OUTPUT]
+
+4.1 Tahap 1: Document Upload (Kolom 1)
+- User mengunggah file PDF (Aplikasi menerima file 1 halaman hingga 50 halaman).
+- User memilih pengaturan melalui UI:
+  * Target Audiens: Dropdown (Contoh: CIO, IT Manager, Compliance Officer, UMKM).
+  * Bahasa: Toggle Switch (English [Default] / Bahasa Indonesia).
+  * Brand Kit Config: Input warna Hex latar belakang, warna teks, dan upload logo (.png/.svg).
+
+4.2 Tahap 2: Otomatisasi Pembuatan 3 Topik (Kolom 2)
+- Setelah PDF diproses oleh LlamaIndex, sistem otomatis mengirimkan sinyal peta dokumen 
+  ke Gemini 1.5 Flash.
+- Sistem mengeluarkan output berupa Tiga (3) Opsi Topik Konten yang unik, menarik, 
+  dan 100% berakar dari fakta PDF. User harus mengklik salah satu topik untuk lanjut.
+
+4.3 Tahap 3: Pembuatan Teks Soft-Selling & Anti-AI-ish Filter (Kolom 3)
+Ketika topik diklik, Gemini 1.5 Flash menyusun draf berdasarkan aturan berikut:
+- Struktur Soft-Selling: Wajib dibuka dengan cerita masalah industri, dilema operasional, 
+  atau friksi nyata audiens. Penyebutan nama brand/produk (misal: SendQuick) diletakkan 
+  di sepertiga akhir tulisan sebagai solusi logis.
+- Anti-AI-ish Filter Engine: Backend Python secara otomatis akan memeriksa teks output. 
+  Jika ditemukan kosakata klise dari array terlarang, sistem akan memaksa LLM melakukan 
+  rewrite otomatis.
+  * Array Kata Terlarang: ["lanskap", "merevolusi", "komprehensif", "penting sekali", 
+    "menakjubkan", "di era digital ini", "seperti yang kita ketahui", "ingatlah bahwa"]
+- Struktur Kalimat: Maksimal 3 kalimat per paragraf pendek untuk menjaga ritme manusia.
+
+4.4 Tahap 4: Pembuatan Otomatis Slide LinkedIn Carousel (Kolom 3)
+- Secara simultan, sistem backend mengambil poin-poin penting dari teks caption yang 
+  sudah disetujui, lalu memecahnya menjadi struktur 3-5 halaman Slide Infografis.
+- Engine Gambar (Menggunakan library Python seperti `Pillow/PIL` atau serverless `Canvas API` 
+  di Next.js) akan menggabungkan teks ringkasan tersebut dengan bentuk grafis, elemen 
+  ilustrasi, serta menyuntikkan Warna Hex dan Logo Perusahaan dari konfigurasi Brand Kit 
+  user di Kolom 1.
+- Output berupa file gambar terkompresi yang siap diunduh dalam format PDF/Gambar beruntun 
+  untuk diunggah sebagai LinkedIn Carousel.
+
+4.5 Tahap 5: Output & Integrasi (Kolom 3)
+- Menyediakan Rich Text Editor untuk sentuhan akhir manusia.
+- Tombol `[Copy Text]`: Menyalin teks bersih beserta hashtag relevan otomatis di bagian bawah.
+- Tombol `[Download Carousel]`: Mengunduh bundle gambar slide grafis.
+
+
+5. TECHNICAL METRICS & VERIFICATION LOGIC (THE 95% TRUTH RULE)
+--------------------------------------------------------------------------------
+Untuk memastikan validitas isi konten minimal 95% bebas halusinasi, sistem backend 
+FastAPI menjalankan proses verifikasi otomatis menggunakan GPT-4o sebagai auditor:
+
+5.1 Algoritma Kalkulasi Skor Validitas (Mathematical Formula)
+Setiap draf konten yang dihasilkan dipecah menjadi kumpulan klaim/pernyataan tunggal C = {c_1, c_2, ..., c_n}. Setiap klaim (c_i) dicocokkan secara silang dengan chunk dokumen asli (R) di Supabase pgvector menggunakan model Auditor (GPT-4o).
+
+Nilai fungsi kepatuhan data ditentukan sebagai berikut:
+- Value(c_i) = 1.0  -> Jika c_i terbukti eksplisit di dalam R (Entailed).
+- Value(c_i) = 0.5  -> Jika c_i bersifat konteks industri umum tanpa kesalahan fakta (Neutral).
+- Value(c_i) = 0.0  -> Jika c_i salah, tidak terbukti, atau overclaiming (Contradicted).
+
+Rumus Perhitungan Skor Validitas Akhir (V):
+V = ( Sum_dari_i=1_sampai_n( Value(c_i) ) / n ) * 100%
+
+Sistem Backend FastAPI wajib menolak output dan memicu fungsi penyuntingan otomatis jika V < 95%.
+
+5.2 Algoritma Kalkulasi Skor Validitas
+1. Teks caption yang dihasilkan AI dipecah menjadi kumpulan klaim/pernyataan tunggal (C).
+2. Setiap klaim (c_i) dicocokkan secara silang dengan chunk dokumen asli (R) di Supabase.
+3. GPT-4o bertindak sebagai Hakim Kepatuhan Data dan memberikan nilai:
+   - Skor 1.0 : Jika fakta di draf tertulis eksplisit di PDF (Entailed).
+   - Skor 0.5 : Jika fakta bersifat edukasi umum yang netral tanpa kesalahan (Neutral).
+   - Skor 0.0 : Jika fakta salah, tidak ada bukti, atau melebih-lebihkan kemampuan (Contradicted).
+4. Rumus Matematika Backend:
+   Skor Akhir = (Total Nilai Klaim / Total Jumlah Klaim) * 100%
+
+5.3 Desain UI Response Loop
+- Jika Skor Akhir >= 95%, UI menampilkan badge warna hijau: `[🟩 Validity Score: XX%] Safe to Post`.
+- Jika Skor Akhir < 95%, backend mengirimkan lokasi array kalimat yang bernilai 0.0. 
+  Layar text editor di Kolom 3 akan memberikan highlight stabilo kuning pada kalimat tersebut 
+  agar tim marketing tahu bagian mana yang mengandung kesalahan data teknis sebelum diposting.
+
+
+6. NON-FUNCTIONAL REQUIREMENTS & SCALABILITY ROADMAP
+--------------------------------------------------------------------------------
+6.1 Keamanan & Privasi Data (Enterprise Security)
+- Setiap file PDF yang diunggah wajib diikat dengan `Organization_ID` atau `User_ID` di 
+  Supabase Row-Level Security (RLS) untuk mencegah kebocoran dokumen antar pengguna SaaS.
+- Menyediakan tombol "Wipe Workspace Memory" yang akan menghapus biner PDF di storage 
+  sekaligus baris data vektor di `pgvector` dalam satu kali klik.
+
+6.2 Skalabilitas Format Konten (Future Growth Roadmap)
+Arsitektur database dan fungsi API di FastAPI harus dirancang menggunakan prinsip 
+Polimorfisme (Object-Oriented) agar di masa depan, tim marketing bisa menambah pilihan 
+output dengan mudah via UI:
+- Opsi X Thread: Memotong teks otomatis menjadi barisan utas maksimal 280 karakter.
+- Opsi Script Video Shorts/TikTok: Menghasilkan naskah dua kolom (Kolom Visual & Kolom Audio).
+- Opsi Artikel Blog: Mengubah teks ringkas menjadi artikel panjang berstruktur HTML tag (H2, H3).
+================================================================================

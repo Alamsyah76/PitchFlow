@@ -1,0 +1,111 @@
+# =============================================================================
+# Secrets and local environment files
+# =============================================================================
+.env
+*/.env
+**/.env
+.env.local
+*/.env.local
+**/.env.local
+.env.production
+*/.env.production
+**/.env.production
+.env.development
+*/.env.development
+**/.env.development
+
+# Keep committed templates visible.
+!.env.example
+!*/.env.example
+!**/.env.example
+
+# =============================================================================
+# Python artifacts
+# =============================================================================
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+**/.mypy_cache/
+.ruff_cache/
+**/.ruff_cache/
+.coverage
+**/.coverage
+htmlcov/
+**/htmlcov/
+
+# Python virtual environments
+venv/
+.venv/
+*/venv/
+*/.venv/
+**/venv/
+**/.venv/
+backend/venv_py311/
+
+# Python build/package output
+build/
+dist/
+**/build/
+**/dist/
+*.egg-info/
+**/*.egg-info/
+
+# =============================================================================
+# Databases and local runtime state
+# =============================================================================
+*.db
+dev.db
+backend/dev.db
+
+# =============================================================================
+# Node / Next.js artifacts
+# =============================================================================
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+**/out/
+dist/
+**/dist/
+build/
+**/build/
+*.tsbuildinfo
+
+# =============================================================================
+# Logs, generated local output, and temporary files
+# =============================================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+backend/carousel_output/
+tmp/
+temp/
+**/tmp/
+**/temp/
+
+# =============================================================================
+# IDE and OS files
+# =============================================================================
+.vscode/
+**/.vscode/
+.idea/
+**/.idea/
+.DS_Store
+**/.DS_Store
+Thumbs.db
+**/Thumbs.db
+storage/documents/
+pitchflow_usage.json
+pitchflow_users.json
+pitchflow_otps.json
+pitchflow_sender.json

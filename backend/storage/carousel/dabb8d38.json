@@ -1,0 +1,21 @@
+{
+  "carousel_id": "dabb8d38",
+  "slides": 3,
+  "theme": {
+    "primary_hex": "#2C3E50",
+    "secondary_hex": "#ECF0F1",
+    "accent_hex": "#E67E22",
+    "bg_style": "solid",
+    "visual_concept": "A professional and clean design featuring dark text on a light background. The primary color is a deep navy blue for text and headings, while the secondary color is a soft light gray for backgrounds and sections. The accent color is a vibrant orange to highlight key points and call-to-action elements. The overall theme conveys innovation and technology in the aviation industry, with a focus on lightweight design tools."
+  },
+  "image_paths": [
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\dabb8d38_slide_1.jpg",
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\dabb8d38_slide_2.jpg",
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\dabb8d38_slide_3.jpg"
+  ],
+  "image_urls": [
+    "/storage/carousel/dabb8d38_slide_1.jpg",
+    "/storage/carousel/dabb8d38_slide_2.jpg",
+    "/storage/carousel/dabb8d38_slide_3.jpg"
+  ]
+}

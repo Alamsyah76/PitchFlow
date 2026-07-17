@@ -1,0 +1,17 @@
+{
+  "carousel_id": "31d49e9f",
+  "slides": 1,
+  "theme": {
+    "primary_hex": "#2C3E50",
+    "secondary_hex": "#ECF0F1",
+    "accent_hex": "#E74C3C",
+    "bg_style": "solid",
+    "visual_concept": "A professional and clean design featuring a light background with dark text. The primary color is a deep navy for headings and key points, while a soft light gray serves as the background. The accent color is a vibrant red for highlighting important features and calls to action. The layout includes clear sections for each aspect of the IP camera innovation, with icons representing security, analytics, and integration."
+  },
+  "image_paths": [
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\31d49e9f_slide_1.jpg"
+  ],
+  "image_urls": [
+    "/storage/carousel/31d49e9f_slide_1.jpg"
+  ]
+}

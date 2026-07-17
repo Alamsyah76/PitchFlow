@@ -1,0 +1,49 @@
+{
+  "domain_id": "unknown_domain_candidate",
+  "type": "temporary",
+  "confidence_behavior": {
+    "mode": "conservative",
+    "description": "Use this profile when semantic evidence does not confidently match an existing permanent domain.",
+    "max_topics_when_low_confidence": 1,
+    "allow_automatic_domain_promotion": false
+  },
+  "allowed_behavior": {
+    "evidence_grounded_only": true,
+    "narrow_topic_generation": true,
+    "conservative_caption_generation": true,
+    "use_current_document_evidence_only": true,
+    "prefer_single_strong_topic": true
+  },
+  "forbidden_behavior": {
+    "force_erp_framing": true,
+    "force_network_framing": true,
+    "force_hardware_framing": true,
+    "force_alerting_framing": true,
+    "use_monitoring_fallback": true,
+    "use_domain_specific_templates": true,
+    "automatic_domain_promotion": true,
+    "stale_domain_term_reuse": true
+  },
+  "output_limits": {
+    "max_topics": 1,
+    "allow_broad_platform_claims": false,
+    "allow_keyword_dump_phrasing": false,
+    "allow_unsupported_brand_labels": false,
+    "allow_known_domain_fallback_labels": false
+  },
+  "promotion_requirements": {
+    "human_review_required": true,
+    "distinct_vocabulary_required": true,
+    "distinct_business_workflow_required": true,
+    "distinct_contamination_risks_required": true,
+    "golden_sample_required": true,
+    "manual_profile_addition_required": true
+  },
+  "fallback_policy": {
+    "on_weak_evidence": "reduce_output",
+    "on_generic_topic": "reject_or_reduce",
+    "on_cross_domain_framing": "hard_fail_or_reduce",
+    "on_stale_terms_detected": "hard_fail_or_reduce",
+    "preferred_strategy": "less_output_more_grounding"
+  }
+}

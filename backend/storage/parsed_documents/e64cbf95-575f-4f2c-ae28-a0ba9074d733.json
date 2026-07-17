@@ -1,0 +1,33 @@
+{
+  "parser": "legacy_fallback",
+  "success": false,
+  "document_id": "e64cbf95-575f-4f2c-ae28-a0ba9074d733",
+  "pages": [
+    {
+      "page_number": 1,
+      "markdown": "Hirschmann Industrial Networking\nHirschmann by Belden provides industrial Ethernet switches and routers for factory automation.\nHirschmann RSP and MS series managed switches support PROFINET, EtherNet/IP, and Modbus TCP.\nHiVision software enables centralized monitoring, topology discovery, and alarm management.\nOpenRail and eCore switches support VLAN, QoS, STP/RSTP, and port security for industrial use.",
+      "text": "Hirschmann Industrial Networking\nHirschmann by Belden provides industrial Ethernet switches and routers for factory automation.\nHirschmann RSP and MS series managed switches support PROFINET, EtherNet/IP, and Modbus TCP.\nHiVision software enables centralized monitoring, topology discovery, and alarm management.\nOpenRail and eCore switches support VLAN, QoS, STP/RSTP, and port security for industrial use.",
+      "headings": [
+        "Hirschmann Industrial Networking"
+      ],
+      "tables": [],
+      "images_or_figures": [],
+      "raw_blocks": [
+        {
+          "page_number": 1,
+          "section_heading": "Hirschmann Industrial Networking",
+          "block_type": "paragraph",
+          "text": "Hirschmann Industrial Networking\nHirschmann by Belden provides industrial Ethernet switches and routers for factory automation.\nHirschmann RSP and MS series managed switches support PROFINET, EtherNet/IP, and Modbus TCP.\nHiVision software enables centralized monitoring, topology discovery, and alarm management.\nOpenRail and eCore switches support VLAN, QoS, STP/RSTP, and port security for industrial use."
+        }
+      ],
+      "raw": {}
+    }
+  ],
+  "full_markdown": "Hirschmann Industrial Networking\nHirschmann by Belden provides industrial Ethernet switches and routers for factory automation.\nHirschmann RSP and MS series managed switches support PROFINET, EtherNet/IP, and Modbus TCP.\nHiVision software enables centralized monitoring, topology discovery, and alarm management.\nOpenRail and eCore switches support VLAN, QoS, STP/RSTP, and port security for industrial use.",
+  "full_text": "Hirschmann Industrial Networking\nHirschmann by Belden provides industrial Ethernet switches and routers for factory automation.\nHirschmann RSP and MS series managed switches support PROFINET, EtherNet/IP, and Modbus TCP.\nHiVision software enables centralized monitoring, topology discovery, and alarm management.\nOpenRail and eCore switches support VLAN, QoS, STP/RSTP, and port security for industrial use.",
+  "parse_confidence": 0.45,
+  "errors": [
+    "LlamaParse SDK import failed: No module named 'llama_cloud'"
+  ],
+  "legacy_total_pages": 1
+}

@@ -1,0 +1,292 @@
+{
+  "app": {
+    "name": "Content Studio AI",
+    "description": "Generate engaging content from your documents in seconds.",
+    "theme": {
+      "mode": "light",
+      "primary": "#6D5DFC",
+      "secondary": "#8B5CF6",
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "border": "#E5E7EB",
+      "text": "#0F172A",
+      "muted": "#64748B",
+      "radius": "16px",
+      "shadow": "0 8px 30px rgba(15,23,42,0.08)"
+    }
+  },
+
+  "layout": {
+    "type": "dashboard",
+    "sidebar": {
+      "width": 260,
+      "fixed": true
+    },
+    "header": {
+      "height": 80
+    },
+    "content": {
+      "maxWidth": 1440,
+      "padding": 32
+    }
+  },
+
+  "sidebar": {
+    "logo": {
+      "icon": "hexagon",
+      "text": "ContentAI"
+    },
+    "menu": [
+      {
+        "label": "Dashboard",
+        "icon": "layout-dashboard",
+        "route": "/dashboard"
+      },
+      {
+        "label": "Content Studio",
+        "icon": "sparkles",
+        "route": "/content-studio",
+        "active": true
+      },
+      {
+        "label": "Image Studio",
+        "icon": "image",
+        "route": "/image-studio"
+      },
+      {
+        "label": "History",
+        "icon": "history",
+        "route": "/history"
+      },
+      {
+        "label": "Saved",
+        "icon": "bookmark",
+        "route": "/saved"
+      },
+      {
+        "label": "Templates",
+        "icon": "file-text",
+        "route": "/templates"
+      },
+      {
+        "label": "Settings",
+        "icon": "settings",
+        "route": "/settings"
+      }
+    ],
+
+    "recentGenerations": [
+      {
+        "title": "Marketing Strategy.pdf",
+        "type": "AI Generated Post",
+        "time": "2 minutes ago"
+      },
+      {
+        "title": "Digital Transformation.pdf",
+        "type": "LinkedIn Post",
+        "time": "1 hour ago"
+      },
+      {
+        "title": "Productivity Tips.pdf",
+        "type": "Instagram Caption",
+        "time": "3 hours ago"
+      }
+    ],
+
+    "upgradeCard": {
+      "title": "Unlock More Power",
+      "description": "Upgrade to Pro for unlimited generations and advanced features.",
+      "button": "Upgrade Now"
+    }
+  },
+
+  "header": {
+    "title": "Content Studio AI",
+    "subtitle": "Generate engaging content from your documents in seconds.",
+    "credits": {
+      "value": 1250,
+      "label": "Credits"
+    },
+    "user": {
+      "name": "John Doe",
+      "avatar": true
+    }
+  },
+
+  "workflowStepper": {
+    "type": "horizontal",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Upload PDF",
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "title": "Generate Topics"
+      },
+      {
+        "id": 3,
+        "title": "Select Topic"
+      },
+      {
+        "id": 4,
+        "title": "Generate Caption"
+      },
+      {
+        "id": 5,
+        "title": "Generate Image"
+      }
+    ]
+  },
+
+  "uploadSection": {
+    "layout": "2-column",
+
+    "leftCard": {
+      "title": "Upload PDF Document",
+      "description": "Upload any PDF document to extract key insights.",
+
+      "dropzone": {
+        "accept": [".pdf"],
+        "multiple": false,
+        "icon": "cloud-upload",
+        "button": "Choose File"
+      },
+
+      "uploadedFile": {
+        "name": "Marketing Strategy.pdf",
+        "size": "2.4 MB",
+        "status": "success"
+      }
+    },
+
+    "rightCard": {
+      "title": "Input Keyword",
+      "optional": true,
+
+      "input": {
+        "placeholder": "Enter keyword..."
+      },
+
+      "tips": [
+        "Use specific keywords related to your content",
+        "Add target audience",
+        "Include content tone"
+      ],
+
+      "actionButton": {
+        "label": "Generate Topics",
+        "variant": "gradient"
+      }
+    }
+  },
+
+  "topicsSection": {
+    "title": "AI Generated Topics",
+    "subtitle": "Select a topic to create amazing content.",
+
+    "cards": [
+      {
+        "id": 1,
+        "title": "The Future of Digital Marketing in 2024",
+        "score": 92,
+        "potential": "High",
+        "selected": true
+      },
+      {
+        "id": 2,
+        "title": "AI Automation for Business Growth",
+        "score": 78,
+        "potential": "Medium",
+        "selected": false
+      },
+      {
+        "id": 3,
+        "title": "Building a Winning Content Strategy",
+        "score": 88,
+        "potential": "High",
+        "selected": false
+      }
+    ]
+  },
+
+  "captionStudio": {
+    "layout": "70-30",
+
+    "editor": {
+      "title": "Caption Studio",
+
+      "toolbar": [
+        "bold",
+        "italic",
+        "underline",
+        "bullet-list",
+        "ordered-list",
+        "link",
+        "emoji",
+        "hashtag"
+      ],
+
+      "content": {
+        "headline": "The Future of Digital Marketing in 2024",
+        "body": "Digital marketing is evolving faster than ever. Brands that leverage data, creativity, and AI-powered tools will stay ahead of the competition.",
+        "hashtags": [
+          "#DigitalMarketing",
+          "#MarketingStrategy",
+          "#FutureOfMarketing",
+          "#GrowthMindset",
+          "#AI"
+        ]
+      },
+
+      "actions": [
+        {
+          "label": "Copy Caption",
+          "variant": "outline"
+        }
+      ]
+    },
+
+    "insights": {
+      "title": "Performance Insights",
+
+      "metrics": [
+        {
+          "label": "Engagement Potential",
+          "value": 92
+        },
+        {
+          "label": "Audience Relevance",
+          "value": 89
+        },
+        {
+          "label": "Readability Score",
+          "value": 85
+        }
+      ],
+
+      "badge": {
+        "type": "success",
+        "title": "High Viral Potential",
+        "description": "This topic has high potential to generate engagement."
+      }
+    }
+  },
+
+  "footerActionBar": {
+    "sticky": true,
+
+    "actions": [
+      {
+        "label": "Copy Caption",
+        "variant": "secondary"
+      },
+      {
+        "label": "Generate Image",
+        "variant": "primary-gradient",
+        "icon": "sparkles"
+      }
+    ]
+  }
+}

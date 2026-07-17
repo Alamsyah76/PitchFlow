@@ -1,0 +1,17 @@
+{
+  "carousel_id": "3db6360f",
+  "slides": 1,
+  "theme": {
+    "primary_hex": "#003366",
+    "secondary_hex": "#F2F2F2",
+    "accent_hex": "#FFCC00",
+    "bg_style": "solid",
+    "visual_concept": "A professional and clean design featuring a light background with dark text. The primary color represents trust and reliability, while the secondary color provides a neutral backdrop. The accent color adds a touch of vibrancy, highlighting key points and calls to action. The overall theme emphasizes innovation in security technology, showcasing the advanced features of the Sarix IP camera in a corporate style."
+  },
+  "image_paths": [
+    "C:\\Users\\admin\\Documents\\AI Marketing Semantic Content Engine OS 2\\backend\\storage\\carousel\\3db6360f_slide_1.jpg"
+  ],
+  "image_urls": [
+    "/storage/carousel/3db6360f_slide_1.jpg"
+  ]
+}

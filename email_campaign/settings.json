@@ -1,0 +1,11 @@
+{
+  "daily_limit": 50,
+  "smtp_host": "",
+  "smtp_port": 465,
+  "smtp_username": "",
+  "smtp_password": "",
+  "imap_host": "",
+  "imap_port": 993,
+  "sender_name": "",
+  "sender_email": ""
+}

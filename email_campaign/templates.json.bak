@@ -1,0 +1,22 @@
+{
+  "templates": [
+    {
+      "id": "tpl_1_1783765353",
+      "title": "Perkenalan - SendQuick Solusi Notifikasi & Alerting Enterprise",
+      "subject": "Perkenalan - SendQuick Solusi Notifikasi & Alerting Enterprise",
+      "body_html": "",
+      "created_at": "2026-07-11T17:22:33.711537",
+      "updated_at": "2026-07-11T17:22:33.711537"
+    },
+    {
+      "id": "tpl_2_1783770921",
+      "title": "Uji Coba",
+      "subject": "Test",
+      "body_html": "<p>Hanya dalam uji coba</p>",
+      "body_text": "Hanya dalam uji coba",
+      "created_at": "2026-07-11T18:55:21.127681",
+      "updated_at": "2026-07-11T18:55:21.127696"
+    }
+  ],
+  "active_template": "tpl_1_1783765353"
+}
