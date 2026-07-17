@@ -152,6 +152,7 @@ export default function ContentStudioPage() {
   const [imageGenerationError, setImageGenerationError] = useState<string | null>(null)
   const [hasGeneratedImage, setHasGeneratedImage] = useState(false)
   const outputLanguage: 'id' = 'id'
+  const [agenticMode, setAgenticMode] = useState(true)
   const [loading, setLoading] = useState<LoadingState>({ upload: false, topics: false, caption: false, carousel: false })
   const [errors, setErrors] = useState<ErrorState>({})
   const [apiError, setApiError] = useState<string | null>(null)
@@ -256,7 +257,9 @@ export default function ContentStudioPage() {
         active_document_id: documentId,
         selected_language: outputLanguage,
       })
-      const response = await fetchTopics(documentId, outputLanguage, abortController.signal)
+      const response = agenticMode
+        ? await (await import('../../lib/api')).agenticFetchTopics(documentId, abortController.signal)
+        : await fetchTopics(documentId, outputLanguage, abortController.signal)
       // Guard: discard stale response
       if (gen !== requestGeneration.current) return
       const rawNormalized = normalizeTopics(response)
@@ -347,7 +350,14 @@ export default function ContentStudioPage() {
         business_angle: selectedTopic.business_angle,
         evidence_chunks: selectedTopic.evidence_chunks ?? [],
       })
-      const response = await generateCaption(payload, abortController.signal)
+      const response = agenticMode
+        ? await (await import('../../lib/api')).agenticGenerateCaption({
+            document_id: documentId,
+            topic_title: selectedTopic.title,
+            topic_angle: selectedTopic.angle || selectedTopic.business_angle || '',
+            topic_key_points: selectedTopic.key_points || [],
+          }, abortController.signal)
+        : await generateCaption(payload, abortController.signal)
       // Guard: discard stale response
       if (gen !== requestGeneration.current) return
       const capData = response.data ?? response
@@ -587,6 +597,15 @@ export default function ContentStudioPage() {
             onChooseFile={() => fileInputRef.current?.click()}
             onGenerateTopics={handleGenerateTopics}
           />
+          {/* Agentic RAG Status */}
+          <div className="px-3 md:px-4">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5">
+              <span className={`h-2.5 w-2.5 rounded-full ${selectedFile || uploadedDocument ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+              <span className="text-xs font-medium text-slate-600">
+                Agentic RAG {selectedFile || uploadedDocument ? 'Active' : 'Ready'}
+              </span>
+            </div>
+          </div>
           </div>
 
           {hasTopics && (

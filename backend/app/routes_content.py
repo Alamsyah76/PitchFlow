@@ -262,3 +262,96 @@ async def download_zip(payload: dict):
         media_type="application/zip",
         headers={"Content-Disposition": f"attachment; filename={topic_title[:30]}.zip"}
     )
+
+
+# ── Agentic RAG Pipeline Endpoints (new layer, does not replace existing) ──
+
+from app.content_engine.agentic import agentic_generate_topics, agentic_generate_caption
+from app.content_engine.rag import load_rag, chunk_text
+
+
+@router.post("/topics/agentic")
+async def get_topics_agentic(payload: dict):
+    """Generate topics using Agentic RAG pipeline (Strategy Agent + Data Agent)"""
+    doc_id = payload.get("document_id", "")
+    if not doc_id:
+        raise HTTPException(400, "document_id is required")
+
+    meta_file = UPLOAD_DIR / f"{doc_id}.json"
+    if not meta_file.exists():
+        raise HTTPException(404, "Document not found")
+
+    meta = json.loads(meta_file.read_text())
+    text = meta.get("text", "")
+    filename = meta.get("filename", "")
+
+    if not text:
+        raise HTTPException(400, "Document text is empty")
+
+    try:
+        # Load real chunks from RAG for better fact extraction
+        rag_data = load_rag(doc_id, UPLOAD_DIR)
+        chunks = rag_data.get("chunks", [])
+        if not chunks:
+            chunks = chunk_text(text)
+
+        topics = agentic_generate_topics(text, filename, chunks=chunks)
+        meta["topics"] = topics
+        meta_file.write_text(json.dumps(meta, indent=2, ensure_ascii=False))
+        return {"success": True, "data": {"topics": topics}}
+    except Exception as e:
+        logger.error(f"Agentic topics error: {e}")
+        raise HTTPException(500, str(e))
+
+
+@router.post("/generate-caption/agentic")
+async def generate_caption_agentic(payload: dict):
+    """Generate caption using Agentic RAG pipeline (Data → Strategy → Reporting Agent)"""
+    doc_id = payload.get("document_id", "")
+    topic_title = payload.get("topic_title", "")
+    topic_angle = payload.get("topic_angle", "")
+    topic_key_points = payload.get("topic_key_points", [])
+
+    if not all([doc_id, topic_title]):
+        raise HTTPException(400, "document_id and topic_title are required")
+
+    meta_file = UPLOAD_DIR / f"{doc_id}.json"
+    if not meta_file.exists():
+        raise HTTPException(404, "Document not found")
+
+    meta = json.loads(meta_file.read_text())
+    text = meta.get("text", "")
+    filename = meta.get("filename", "")
+    industry_hint = payload.get("industry", "")
+
+    if not text:
+        raise HTTPException(400, "Document text is empty")
+
+    try:
+        # Load real chunks from RAG
+        rag_data = load_rag(doc_id, UPLOAD_DIR)
+        chunks = rag_data.get("chunks", [])
+        if not chunks:
+            chunks = chunk_text(text)
+
+        result = agentic_generate_caption(
+            text=text,
+            filename=filename,
+            topic_title=topic_title,
+            topic_angle=topic_angle,
+            topic_key_points=topic_key_points,
+            chunks=chunks,
+            industry_hint=industry_hint,
+        )
+        return {
+            "success": True,
+            "data": {
+                "caption": result.caption,
+                "hashtags": result.hashtags,
+                "verified_claims": result.verified_claims,
+                "unverified_claims": result.unverified_claims,
+            }
+        }
+    except Exception as e:
+        logger.error(f"Agentic caption error: {e}")
+        raise HTTPException(500, str(e))

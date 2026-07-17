@@ -26,27 +26,29 @@ def retrieve_facts(query: str, chunks: list, top_k: int = 5) -> DataContext:
 RESEARCH QUERY: {query}
 
 DOCUMENT CHUNKS:
-{chunks_text[:6000]}
+{chunks_text[:8000]}
 
 TASK:
 1. Identify which chunks are relevant to the query
-2. Extract specific FACTS, FIGURES, and QUOTES from those chunks
+2. Extract specific FACTS, FIGURES, METRICS, SPECIFICATIONS, NAMES, and DATES from those chunks
 3. For EACH fact, cite the source chunk number
+4. Prioritize: specific numbers > general statements, technical specs > descriptions
 
 Output JSON:
 {{
   "topic_title": "Brief topic label",
   "facts": [
-    {{"statement": "Specific fact from document", "source_chunk": 0, "context": "Brief surrounding context"}},
-    {{"statement": "Another specific fact", "source_chunk": 2, "context": "Brief surrounding context"}}
+    {{"statement": "Spesifik: RAM 8GB, HDD 1TB, form factor 1U", "source_chunk": 0, "context": "Spesifikasi hardware produk"}},
+    {{"statement": "Spesifik: Mengkonversi email, Syslog, SNMP Trap ke SMS", "source_chunk": 1, "context": "Fitur konversi pesan"}}
   ]
 }}
 
 RULES:
 - Only include facts DIRECTLY stated in the chunks — no inference
-- Each fact must have a source_chunk number
-- Prefer specific numbers, dates, names over general statements
-- Extract 3-5 most relevant facts
+- Each fact must have a source_chunk number (0, 1, 2, etc.)
+- PREFER: angka, spesifikasi teknis, nama produk, harga, tanggal, persentase
+- AVOID: general statements without numbers
+- Extract 3-6 most relevant and specific facts
 - Bahasa Indonesia
 """
 

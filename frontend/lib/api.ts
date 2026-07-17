@@ -172,6 +172,30 @@ export async function fetchTopics(document_id: string, lang = 'en', signal?: Abo
   return parseJsonResponse<TopicsResponse>(resp)
 }
 
+export async function agenticFetchTopics(document_id: string, signal?: AbortSignal): Promise<any> {
+  const url = apiUrl('/api/v1/content/topics/agentic')
+  debugApi('agenticFetchTopics request', { url, document_id })
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ document_id }),
+    signal,
+  })
+  return parseJsonResponse<any>(resp)
+}
+
+export async function agenticGenerateCaption(payload: any, signal?: AbortSignal): Promise<any> {
+  const url = apiUrl('/api/v1/content/generate-caption/agentic')
+  debugApi('agenticGenerateCaption request', { url, body: payload })
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal,
+  })
+  return parseJsonResponse<any>(resp)
+}
+
 export async function generateImageFromPrompt(payload: {
   linkedin_image_prompt: string
   image_size?: string
