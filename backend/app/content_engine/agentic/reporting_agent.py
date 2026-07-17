@@ -52,6 +52,7 @@ REQUIREMENTS:
 4. AVOID these phrases: {', '.join(AVOID[:15])}
 5. End with a question or invitation to engage (not a sales pitch)
 6. Language: Indonesian
+7. NO emojis, NO icons, NO bullet symbols at the start of paragraphs
 
 Output JSON:
 {{
