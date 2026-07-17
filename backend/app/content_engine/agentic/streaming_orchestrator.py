@@ -45,8 +45,8 @@ def stream_agentic_topics(text: str, filename: str, chunks: Optional[List[str]] 
             "message": f"{len(data_ctx.facts)} fakta ditemukan untuk topic {i+1}"
         }
 
-    yield {"agent": "Complete", "status": "done", "progress": 100, "message": "Topics siap!"}
-    return enriched_topics
+    yield {"agent": "Complete", "status": "done", "progress": 100, "message": "Topics siap!", "final_result": {"topics": enriched_topics}}
+    return {"topics": enriched_topics}
 
 
 def stream_agentic_caption(

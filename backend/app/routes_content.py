@@ -368,40 +368,25 @@ import asyncio
 import json
 
 
-async def _sse_stream(sync_gen):
-    """Run sync generator in thread pool, yield SSE events."""
+async def _sse_topics_stream(text: str, filename: str, chunks: list):
+    """Simple SSE stream: runs sync generator in thread pool, yields events."""
     loop = asyncio.get_event_loop()
+    gen = stream_agentic_topics(text, filename, chunks)
     final_result = None
 
-    def _iterate():
-        nonlocal final_result
-        try:
-            gen = sync_gen()
-            while True:
-                try:
-                    val = next(gen)
-                    yield val
-                except StopIteration as e:
-                    final_result = e.value
-                    return
-        except Exception as e:
-            yield {"agent": "Error", "status": "error", "progress": 0, "message": str(e)}
-            final_result = None
-
-    gen = _iterate()
     while True:
         try:
             event = await loop.run_in_executor(None, next, gen)
             yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
-            if event.get("agent") == "Complete" and event.get("status") == "done":
-                # Send final result as last event
+            if event.get("agent") == "Complete":
+                final_result = event.get("final_result")
                 yield f"event: result\ndata: {json.dumps(final_result if final_result else {}, ensure_ascii=False)}\n\n"
-                return
-            if event.get("agent") == "Error":
-                yield f"event: error\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
                 return
         except StopIteration:
             break
+        except Exception as e:
+            yield f"event: error\ndata: {json.dumps({'agent': 'Error', 'status': 'error', 'message': str(e)})}\n\n"
+            return
 
 
 @router.get("/topics/agentic/stream")
@@ -427,7 +412,7 @@ async def stream_topics(doc_id: str):
         return stream_agentic_topics(text, filename, chunks)
 
     return StreamingResponse(
-        _sse_stream(_gen),
+        _sse_topics_stream(text, filename, chunks),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
