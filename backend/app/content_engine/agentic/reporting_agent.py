@@ -48,11 +48,10 @@ RAW CHUNKS (for context only):
 REQUIREMENTS:
 1. Write 3 paragraphs following the specified structure
 2. Every claim MUST come from the VERIFIED FACTS above — no invented data
-3. For key claims, append the source chunk number in parentheses: (sumber: Chunk 0)
-4. Natural, conversational tone — not salesy, not robotic
-5. AVOID these phrases: {', '.join(AVOID[:15])}
-6. End with a question or invitation to engage (not a sales pitch)
-7. Language: Indonesian
+3. Natural, conversational tone — not salesy, not robotic
+4. AVOID these phrases: {', '.join(AVOID[:15])}
+5. End with a question or invitation to engage (not a sales pitch)
+6. Language: Indonesian
 
 Output JSON:
 {{
