@@ -8,6 +8,7 @@ import WorkspaceBlueprint from './WorkspaceBlueprint'
 import LoadingButton from './LoadingButton'
 import WorkflowStateBar from './WorkflowStateBar'
 import ContentStudioHero from './ContentStudioHero'
+import AgenticProgress from './AgenticProgress'
 import { fetchTopics, generateCaption, generateImageFromPrompt, generateImageStorytelling, uploadPdf, apiUrl, authHeaders } from '../../lib/api'
 import { autoSaveProject } from '../../lib/workspace-storage'
 import { requireLogin } from '../../lib/auth-check'
@@ -153,6 +154,7 @@ export default function ContentStudioPage() {
   const [hasGeneratedImage, setHasGeneratedImage] = useState(false)
   const outputLanguage: 'id' = 'id'
   const [agenticMode, setAgenticMode] = useState(true)
+  const [agenticActive, setAgenticActive] = useState(false)
   const [loading, setLoading] = useState<LoadingState>({ upload: false, topics: false, caption: false, carousel: false })
   const [errors, setErrors] = useState<ErrorState>({})
   const [apiError, setApiError] = useState<string | null>(null)
@@ -258,8 +260,13 @@ export default function ContentStudioPage() {
         selected_language: outputLanguage,
       })
       const response = agenticMode
-        ? await (await import('../../lib/api')).agenticFetchTopics(documentId, abortController.signal)
+        ? null // SSE handles this via AgenticProgress component
         : await fetchTopics(documentId, outputLanguage, abortController.signal)
+      if (agenticMode) {
+        setAgenticActive(true)
+        setLoading((s) => ({ ...s, topics: false }))
+        return
+      }
       // Guard: discard stale response
       if (gen !== requestGeneration.current) return
       const rawNormalized = normalizeTopics(response)
@@ -598,6 +605,38 @@ export default function ContentStudioPage() {
             onGenerateTopics={handleGenerateTopics}
           />
           </div>
+
+          {agenticActive && documentId && (
+            <div className="px-3 pb-2 md:px-4">
+              <AgenticProgress
+                documentId={documentId}
+                isActive={true}
+                onComplete={(result) => {
+                  setAgenticActive(false)
+                  if (!result || !result.topics) {
+                    const msg = 'No topics were returned. The PDF may not contain enough readable text.'
+                    setApiError(msg)
+                    setErrors((s) => ({ ...s, topics: msg }))
+                    return
+                  }
+                  const rawTopics = result.topics
+                  const normalized = Array.isArray(rawTopics) ? rawTopics.map((t: any, i: number) => ({
+                    id: t.id || String(i + 1),
+                    title: t.title || '',
+                    angle: t.angle || t.business_angle || '',
+                    key_points: t.key_points || [],
+                    facts: t.facts || [],
+                  })) : []
+                  setTopics(normalized)
+                }}
+                onError={(msg) => {
+                  setAgenticActive(false)
+                  setApiError(msg)
+                  setErrors((s) => ({ ...s, topics: msg }))
+                }}
+              />
+            </div>
+          )}
 
           {hasTopics && (
           <div className="min-h-0 flex-1 overflow-y-auto border-t border-slate-100 bg-slate-50/50 p-3 md:p-4">

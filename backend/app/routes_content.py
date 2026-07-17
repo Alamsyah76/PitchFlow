@@ -355,3 +355,83 @@ async def generate_caption_agentic(payload: dict):
     except Exception as e:
         logger.error(f"Agentic caption error: {e}")
         raise HTTPException(500, str(e))
+
+
+# ── SSE Streaming Endpoints for Progress Bar ──
+
+from fastapi.responses import StreamingResponse
+from app.content_engine.agentic.streaming_orchestrator import (
+    stream_agentic_topics,
+    stream_agentic_caption,
+)
+import asyncio
+import json
+
+
+async def _sse_stream(sync_gen):
+    """Run sync generator in thread pool, yield SSE events."""
+    loop = asyncio.get_event_loop()
+    final_result = None
+
+    def _iterate():
+        nonlocal final_result
+        try:
+            gen = sync_gen()
+            while True:
+                try:
+                    val = next(gen)
+                    yield val
+                except StopIteration as e:
+                    final_result = e.value
+                    return
+        except Exception as e:
+            yield {"agent": "Error", "status": "error", "progress": 0, "message": str(e)}
+            final_result = None
+
+    gen = _iterate()
+    while True:
+        try:
+            event = await loop.run_in_executor(None, next, gen)
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+            if event.get("agent") == "Complete" and event.get("status") == "done":
+                # Send final result as last event
+                yield f"event: result\ndata: {json.dumps(final_result if final_result else {}, ensure_ascii=False)}\n\n"
+                return
+            if event.get("agent") == "Error":
+                yield f"event: error\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
+                return
+        except StopIteration:
+            break
+
+
+@router.get("/topics/agentic/stream")
+async def stream_topics(doc_id: str):
+    """SSE stream for Agentic Topic generation with real-time progress."""
+    meta_file = UPLOAD_DIR / f"{doc_id}.json"
+    if not meta_file.exists():
+        raise HTTPException(404, "Document not found")
+
+    meta = json.loads(meta_file.read_text())
+    text = meta.get("text", "")
+    filename = meta.get("filename", "")
+
+    if not text:
+        raise HTTPException(400, "Document text is empty")
+
+    rag_data = load_rag(doc_id, UPLOAD_DIR)
+    chunks = rag_data.get("chunks", [])
+    if not chunks:
+        chunks = chunk_text(text)
+
+    def _gen():
+        return stream_agentic_topics(text, filename, chunks)
+
+    return StreamingResponse(
+        _sse_stream(_gen),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
