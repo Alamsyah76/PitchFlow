@@ -2,6 +2,7 @@
 import os, logging
 from fastapi import APIRouter, HTTPException
 from app.auth_user import register_user, get_user, generate_otp, verify_otp, verify_user, set_user_tier, get_users, get_tier_for_email
+from app.auth import create_jwt_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -55,7 +56,17 @@ async def verify_otp_endpoint(payload: dict):
         raise HTTPException(400, "Invalid or expired OTP code")
 
     verify_user(email)
-    return {"success": True, "message": "Login successful", "data": {"email": email, "name": get_user(email).get("name", "")}}
+    user = get_user(email)
+    token = create_jwt_token(email)
+    return {
+        "success": True,
+        "message": "Login successful",
+        "data": {
+            "email": email,
+            "name": user.get("name", "") if user else "",
+            "token": token,
+        }
+    }
 
 
 @router.post("/logout")
@@ -81,8 +92,9 @@ async def admin_login(payload: dict):
     register_user("Administrator", admin_email)
     set_user_tier(admin_email, "pro")
     verify_user(admin_email)
+    token = create_jwt_token(admin_email)
 
-    return {"success": True, "message": "Admin login successful", "data": {"email": admin_email, "name": "Administrator", "role": "admin"}}
+    return {"success": True, "message": "Admin login successful", "data": {"email": admin_email, "name": "Administrator", "role": "admin", "token": token}}
 
 
 @router.post("/me")

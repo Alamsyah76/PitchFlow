@@ -142,6 +142,26 @@ def get_db_current_user(
     return current_user
 
 
+def create_jwt_token(email: str, user_id: Optional[str] = None) -> str:
+    """Generate a JWT token for authenticated users (used after OTP verify)."""
+    from datetime import datetime, timedelta, timezone
+
+    secret = settings.supabase_jwt_secret if settings else "dev-jwt-secret"
+    if not secret:
+        secret = "dev-jwt-secret"
+
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": user_id or str(uuid.uuid5(uuid.NAMESPACE_DNS, email)),
+        "email": email,
+        "aud": settings.supabase_jwt_audience if settings else "authenticated",
+        "role": "authenticated",
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(days=7)).timestamp()),
+    }
+    return jwt.encode(payload, secret, algorithm="HS256")
+
+
 def _is_dev_mode() -> bool:
     """Check if running in local development mode (bypass auth)."""
     import os

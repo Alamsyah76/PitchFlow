@@ -80,6 +80,7 @@ export default function AuthPage() {
         setUser({ email: d.data.email, name: d.data.name })
         setStep('welcome')
         localStorage.setItem('pitchflow_user', JSON.stringify(d.data))
+        if (d.data.token) localStorage.setItem('access_token', d.data.token)
       } else setError(d.detail || d.message || 'Kode OTP salah.')
     } catch { setError('Gagal terhubung ke server.') }
     setLoading(false)
@@ -100,6 +101,7 @@ export default function AuthPage() {
         setStep('welcome')
         localStorage.setItem('pitchflow_user', JSON.stringify(d.data))
         localStorage.setItem('pitchflow_admin', 'true')
+        if (d.data.token) localStorage.setItem('access_token', d.data.token)
       } else setError(d.detail || d.message || 'Login gagal.')
     } catch { setError('Gagal terhubung ke server.') }
     setLoading(false)
