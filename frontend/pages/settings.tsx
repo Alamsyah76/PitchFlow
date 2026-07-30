@@ -4,9 +4,11 @@ import StudioSidebar from '../components/content-studio/StudioSidebar'
 import StudioHeader from '../components/content-studio/StudioHeader'
 import SenderSettings from '../components/SenderSettings'
 import CampaignSettings from '../components/email-campaign/CampaignSettings'
+import ApiKeySettings from '../components/settings/ApiKeySettings'
 
 const TABS = [
   { id: 'profile', label: 'Profile' },
+  { id: 'apikey', label: 'API Key' },
   { id: 'email', label: 'Email Campaign' },
 ]
 
@@ -39,6 +41,7 @@ export default function SettingsRoute() {
 
           {/* Tab Content */}
           {activeTab === 'profile' && <SenderSettings />}
+          {activeTab === 'apikey' && <ApiKeySettings />}
           {activeTab === 'email' && <CampaignSettings />}
 
         </div>

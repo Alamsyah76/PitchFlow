@@ -30,6 +30,7 @@ def init_db():
             name TEXT NOT NULL DEFAULT '',
             tier TEXT NOT NULL DEFAULT 'free',
             avatar TEXT DEFAULT '',
+            openai_api_key TEXT DEFAULT '',
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
@@ -128,6 +129,18 @@ def update_user_tier(email: str, tier: str):
 def update_user_avatar(email: str, avatar: str):
     _get_db().execute("UPDATE users SET avatar=? WHERE email=?", (avatar, email))
     _get_db().commit()
+
+
+def save_openai_key(email: str, api_key: str):
+    """Simpan OpenAI API key untuk user tertentu (BYOK)."""
+    _get_db().execute("UPDATE users SET openai_api_key=? WHERE email=?", (api_key, email))
+    _get_db().commit()
+
+
+def get_openai_key(email: str) -> str:
+    """Ambil OpenAI API key user, atau None kalau tidak set."""
+    row = _get_db().execute("SELECT openai_api_key FROM users WHERE email=?", (email,)).fetchone()
+    return row["openai_api_key"] if row and row["openai_api_key"] else ""
 
 
 # ── OTP ──
