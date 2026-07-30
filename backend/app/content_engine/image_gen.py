@@ -31,12 +31,37 @@ def _truncate_title(title: str, max_chars: int = 45) -> str:
     """Truncate title to fit DALL-E rendering"""
     if len(title) <= max_chars:
         return title
-    # Try to break at word boundary
     truncated = title[:max_chars]
     last_space = truncated.rfind(" ")
-    if last_space > max_chars * 0.6:  # Only truncate at word if we keep most of it
+    if last_space > max_chars * 0.6:
         return truncated[:last_space] + ".."
     return truncated + ".."
+
+
+def _build_image_prompt(topic_title: str, caption: str, points: list) -> str:
+    """GPT generates a relevant scene, then builds full DALL-E prompt with exact text"""
+    short_title = _truncate_title(topic_title, 45)
+
+    # Step 1: GPT generates scene description relevant to the ACTUAL content (not generic)
+    scene_resp = client.chat.completions.create(model="gpt-4o-mini",
+        messages=[{"role":"system","content":"Buat deskripsi scene visual dalam Bahasa Inggris (max 35 kata) untuk infografis 3D isometric style dengan glassmorphism UI. Scene harus RELEVAN dengan topik — gambar VISUAL yang spesifik mewakili topik. Contoh: untuk topik ERP, scene-nya workflow/process; untuk topik security, scene-nya lock/shield; untuk topik HR, scene-nya people/org chart. Bukan server/network generic. Hanya deskripsi scene."},
+                  {"role":"user", "content":f"Topik: {topic_title}\n\nKonteks: {caption[:500]}"}],
+        temperature=0.7, max_tokens=100)
+    scene = scene_resp.choices[0].message.content.strip()
+
+    # Step 2: Build full DALL-E prompt
+    prompt = (
+        f"Create a professional 3D isometric infographic in glassmorphism and holographic style. "
+        f"Background: variatif gradient pattern. "
+        f"Scene: {scene} "
+        f"\\n\\nEMBEDDED TEXT (render exactly):"
+        f"\\nTITLE (top-left, large white text with orange glow): {short_title}"
+        f"\\nKEY POINTS (left side glass panel, white text):"
+        f"\\n• {points[0]}\\n• {points[1]}\\n• {points[2]}"
+        f"\\n\\nCRITICAL: Render text EXACTLY as written. White on dark background. "
+        f"DO NOT add other text. Scene must be specific to the topic."
+    )
+    return prompt
 
 
 def generate_image(topic_title: str, caption: str, hashtags: list = None, doc_name: str = "") -> dict:
@@ -47,27 +72,10 @@ def generate_image(topic_title: str, caption: str, hashtags: list = None, doc_na
     if not points:
         points = ["Secure authentication for enterprise", "MFA with FIDO2 support", "OTP via SMS email and app"]
 
-    # 2. Shorten title for clean rendering
-    short_title = _truncate_title(topic_title, 45)
+    # 2. Build dynamic DALL-E prompt (scene + text)
+    prompt = _build_image_prompt(topic_title, caption, points)
 
-    # 3. Build DALL-E prompt with exact text content
-    prompt = (
-        "Create a professional semi-anime style infographic image, 1024x1024. "
-        "The image MUST include the following text exactly as specified. "
-        "Text style: clean modern sans-serif, white colored text. "
-        "Place the text on the LEFT SIDE of the image over a dark semi-transparent panel for readability. "
-        f"\\n\\nTITLE (top area, large font): {short_title}"
-        f"\\n\\nPOINTS (below title, medium font):\\n"
-        f"• {points[0]}\\n"
-        f"• {points[1]}\\n"
-        f"• {points[2]}"
-        "\\n\\nRIGHT SIDE: professional relevant illustration/scene supporting the topic. "
-        "DO NOT add any text beyond what is specified above. "
-        "Make sure all text is clearly readable and NOT cut off. "
-        "Keep the overall design clean and professional."
-    )
-
-    # 4. Generate image via DALL-E
+    # 3. Generate image via DALL-E
     resp = client.images.generate(
         model="gpt-image-1",
         prompt=prompt,
@@ -79,7 +87,7 @@ def generate_image(topic_title: str, caption: str, hashtags: list = None, doc_na
     if not img_url and resp.data and resp.data[0].b64_json:
         img_url = f"data:image/png;base64,{resp.data[0].b64_json}"
 
-    # 5. Download and save
+    # 4. Download and save
     bg_path = STORAGE_DIR / f"{img_id}_bg.png"
     urllib.request.urlretrieve(img_url, str(bg_path))
     bg = Image.open(str(bg_path)).convert("RGB")
