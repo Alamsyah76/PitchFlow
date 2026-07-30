@@ -1,7 +1,7 @@
-"""Infografis — DALL-E background + judul + 3 short point, tanpa icon, tanpa overlay"""
-import os, json, textwrap, uuid, urllib.request
+"""Infografis — DALL-E generates complete image with embedded text"""
+import os, json, uuid, urllib.request
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 from openai import OpenAI
 
 _env_path = Path(__file__).resolve().parent.parent.parent / ".env"
@@ -17,89 +17,75 @@ STORAGE_DIR = Path(__file__).resolve().parents[2] / "storage" / "images"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _font(size):
-    for p in [r"C:\Windows\Fonts\segoeui.ttf", r"C:\Windows\Fonts\seguisb.ttf",
-              r"C:\Windows\Fonts\consola.ttf", r"C:\Windows\Fonts\arial.ttf",
-              r"C:\Windows\Fonts\calibri.ttf"]:
-        if Path(p).exists():
-            return ImageFont.truetype(p, size)
-    return ImageFont.load_default()
-
-
-def _generate_prompt(topic: str, caption: str) -> str:
-    resp = client.chat.completions.create(model="gpt-4o-mini",
-        messages=[{"role":"system","content":"Buat prompt DALL-E dalam Bahasa Inggris untuk background infografis dengan gaya semi-anime profesional. Scene harus mendukung topik berikut. Area kiri gambar harus cukup gelap agar teks putih terbaca. JANGAN ada teks dalam gambar. Max 100 kata."},
-                  {"role":"user","content":f"Topik: {topic}\n\nKonteks: {caption[:500]}"}],
-        temperature=0.4, max_tokens=200)
-    return resp.choices[0].message.content.strip()
-
-
-def _generate_image(prompt: str) -> str:
-    resp = client.images.generate(model="gpt-image-1", prompt=prompt, size="1024x1024", quality="auto", n=1)
-    url = resp.data[0].url if resp.data and resp.data[0].url else ""
-    if not url and resp.data and resp.data[0].b64_json:
-        url = f"data:image/png;base64,{resp.data[0].b64_json}"
-    return url
-
-
 def _extract_points(caption: str, topic: str) -> list:
-    """Extract 3 short points (5-8 words each) from caption"""
+    """Extract 3 very short points (max 8 words each) for clean DALL-E rendering"""
     resp = client.chat.completions.create(model="gpt-4o-mini",
-        messages=[{"role":"system","content":"Dari teks berikut, buat 3 poin pendek (masing-masing 5-8 kata) yang merupakan intisari penting. Return JSON: {\"points\":[\"...\",\"...\",\"...\"]}. Poin harus spesifik, grounded pada teks."},
+        messages=[{"role":"system","content":"Dari teks berikut, buat 3 poin SANGAT PENDEK (maksimal 6-8 kata per poin) yang merupakan intisari penting. Return JSON: {\"points\":[\"...\",\"...\",\"...\"]}. Poin harus spesifik, grounded pada teks, dan MUDAH dibaca."},
                   {"role":"user","content":f"Topik: {topic}\n\nTeks:\n{caption[:2000]}"}],
         temperature=0.3, response_format={"type":"json_object"})
     result = json.loads(resp.choices[0].message.content)
     return result.get("points", [])[:3]
 
 
+def _truncate_title(title: str, max_chars: int = 45) -> str:
+    """Truncate title to fit DALL-E rendering"""
+    if len(title) <= max_chars:
+        return title
+    # Try to break at word boundary
+    truncated = title[:max_chars]
+    last_space = truncated.rfind(" ")
+    if last_space > max_chars * 0.6:  # Only truncate at word if we keep most of it
+        return truncated[:last_space] + ".."
+    return truncated + ".."
+
+
 def generate_image(topic_title: str, caption: str, hashtags: list = None, doc_name: str = "") -> dict:
     img_id = str(uuid.uuid4())[:8]
 
-    # 1. Generate scene background
-    prompt = _generate_prompt(topic_title, caption)
-    img_url = _generate_image(prompt)
-
-    # 2. Download background
-    bg_path = STORAGE_DIR / f"{img_id}_bg.png"
-    urllib.request.urlretrieve(img_url, str(bg_path))
-
-    # 3. Open and prepare
-    bg = Image.open(str(bg_path)).convert("RGB")
-    bg = bg.resize((1024, 1024), Image.LANCZOS)
-    W, H = bg.size
-    img = bg.copy()
-    draw = ImageDraw.Draw(img)
-
-    # 4. Extract 3 short points
+    # 1. Extract 3 key points
     points = _extract_points(caption, topic_title)
     if not points:
-        points = [topic_title[:60]]
+        points = ["Secure authentication for enterprise", "MFA with FIDO2 support", "OTP via SMS email and app"]
 
-    # 5. Fonts
-    title_font = _font(38)
-    point_font = _font(22)
+    # 2. Shorten title for clean rendering
+    short_title = _truncate_title(topic_title, 45)
 
-    mx, my = 45, 45
+    # 3. Build DALL-E prompt with exact text content
+    prompt = (
+        "Create a professional semi-anime style infographic image, 1024x1024. "
+        "The image MUST include the following text exactly as specified. "
+        "Text style: clean modern sans-serif, white colored text. "
+        "Place the text on the LEFT SIDE of the image over a dark semi-transparent panel for readability. "
+        f"\\n\\nTITLE (top area, large font): {short_title}"
+        f"\\n\\nPOINTS (below title, medium font):\\n"
+        f"• {points[0]}\\n"
+        f"• {points[1]}\\n"
+        f"• {points[2]}"
+        "\\n\\nRIGHT SIDE: professional relevant illustration/scene supporting the topic. "
+        "DO NOT add any text beyond what is specified above. "
+        "Make sure all text is clearly readable and NOT cut off. "
+        "Keep the overall design clean and professional."
+    )
 
-    # 6. TITLE — langsung di gambar, putih polos
-    draw.rectangle([mx, my, mx+45, my+3], fill=(255, 255, 255, 200))
-    my += 18
-    for line in textwrap.wrap(topic_title, width=28):
-        draw.text((mx, my), line, fill="white", font=title_font)
-        my += 44
+    # 4. Generate image via DALL-E
+    resp = client.images.generate(
+        model="gpt-image-1",
+        prompt=prompt,
+        size="1024x1024",
+        quality="auto",
+        n=1,
+    )
+    img_url = resp.data[0].url if resp.data and resp.data[0].url else ""
+    if not img_url and resp.data and resp.data[0].b64_json:
+        img_url = f"data:image/png;base64,{resp.data[0].b64_json}"
 
-    my += 25
-
-    # 7. POINTS — tanpa icon, teks putih polos
-    for pt in points:
-        for line in textwrap.wrap(pt, width=35):
-            draw.text((mx, my), line, fill="white", font=point_font)
-            my += 28
-        my += 6
-
-    # Save
+    # 5. Download and save
+    bg_path = STORAGE_DIR / f"{img_id}_bg.png"
+    urllib.request.urlretrieve(img_url, str(bg_path))
+    bg = Image.open(str(bg_path)).convert("RGB")
+    bg = bg.resize((1024, 1024), Image.LANCZOS)
     filename = f"{img_id}.jpg"
-    img.save(str(STORAGE_DIR / filename), "JPEG", quality=92)
+    bg.save(str(STORAGE_DIR / filename), "JPEG", quality=95)
     bg_path.unlink(missing_ok=True)
 
     return {"image_url": f"/storage/images/{filename}", "image_path": str(STORAGE_DIR / filename)}

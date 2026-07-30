@@ -2,11 +2,12 @@
 import os
 import json
 import uuid
-import PyPDF2
+import pypdf
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from openai import OpenAI
 
+from app.auth import CurrentUser, get_current_user_or_dev
 from app.content_engine.topic_generator import generate_topics
 from app.content_engine.content_writer import generate_caption
 from app.rate_limit import check_konten_limit, increment_konten, check_image_limit, increment_image
@@ -24,11 +25,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def _extract_pdf_text(filepath: Path) -> str:
     """Extract text from PDF — fallback OCR jika text-based gagal"""
-    # Try PyPDF2 first
+    # Try pypdf first
     text = ""
     try:
         with open(filepath, "rb") as f:
-            reader = PyPDF2.PdfReader(f)
+            reader = pypdf.PdfReader(f)
             for page in reader.pages:
                 t = page.extract_text()
                 if t:
@@ -74,11 +75,11 @@ def _extract_pdf_text(filepath: Path) -> str:
 
 
 @router.post("/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), user: CurrentUser = Depends(get_current_user_or_dev)):
     """Upload PDF → extract text → siapkan untuk topic generation"""
     filename = (file.filename or "").lower()
     if filename and not filename.endswith(".pdf"):
-        raise HTTPException(400, "Only PDF files are supported")
+        raise HTTPException(400, detail={"error_code": "INVALID_FILE_TYPE", "error_message": "Only PDF files are supported"})
 
     doc_id = str(uuid.uuid4())
     filepath = UPLOAD_DIR / f"{doc_id}.pdf"
@@ -89,7 +90,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     text = _extract_pdf_text(filepath)
 
     if not text or len(text) < 50:
-        raise HTTPException(400, "Could not extract sufficient text from PDF")
+        raise HTTPException(400, detail={"error_code": "TEXT_EXTRACTION_FAILED", "error_message": "Could not extract sufficient text from PDF"})
 
     # Simpan metadata
     meta = {"id": doc_id, "filename": file.filename, "text_length": len(text), "text": text}
@@ -115,11 +116,11 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 
 @router.get("/topics")
-async def get_topics(document_id: str, lang: str = "id"):
+async def get_topics(document_id: str, lang: str = "id", user: CurrentUser = Depends(get_current_user_or_dev)):
     """Generate 2 topic angles from document"""
     meta_path = UPLOAD_DIR / f"{document_id}.json"
     if not meta_path.exists():
-        raise HTTPException(404, "Document not found")
+        raise HTTPException(404, detail={"error_code": "DOCUMENT_NOT_FOUND", "error_message": "Document not found"})
 
     meta = json.loads(meta_path.read_text())
     text = meta["text"]
@@ -133,11 +134,11 @@ async def get_topics(document_id: str, lang: str = "id"):
 
         return {"success": True, "data": {"topics": topics}}
     except Exception as e:
-        raise HTTPException(500, f"Topic generation failed: {str(e)}")
+        raise HTTPException(500, detail={"error_code": "TOPIC_GENERATION_FAILED", "error_message": f"Topic generation failed: {str(e)}"})
 
 
 @router.post("/generate-caption")
-async def generate_caption_endpoint(payload: dict):
+async def generate_caption_endpoint(payload: dict, user: CurrentUser = Depends(get_current_user_or_dev)):
     """Generate LinkedIn caption + hashtags from selected topic"""
     document_id = payload.get("document_id") or payload.get("documentId")
     raw_topic = payload.get("topic") or payload.get("selected_topic") or ""
@@ -151,16 +152,16 @@ async def generate_caption_endpoint(payload: dict):
         topic_detail = {"title": topic_title, "angle": "", "key_points": []}
 
     if not document_id or not topic_title:
-        raise HTTPException(400, "document_id and topic are required")
+        raise HTTPException(400, detail={"error_code": "MISSING_FIELDS", "error_message": "document_id and topic are required"})
 
     # Rate limit konten
     kc = check_konten_limit()
     if not kc["allowed"]:
-        raise HTTPException(429, f"Batas konten bulan ini sudah habis ({kc['used']}/{kc['limit']}). Upgrade tier untuk lanjut.")
+        raise HTTPException(429, detail={"error_code": "CONTENT_LIMIT_EXCEEDED", "error_message": f"Batas konten bulan ini sudah habis ({kc['used']}/{kc['limit']}). Upgrade tier untuk lanjut."})
 
     meta_path = UPLOAD_DIR / f"{document_id}.json"
     if not meta_path.exists():
-        raise HTTPException(404, "Document not found")
+        raise HTTPException(404, detail={"error_code": "DOCUMENT_NOT_FOUND", "error_message": "Document not found"})
 
     meta = json.loads(meta_path.read_text())
     text = meta["text"]
@@ -177,11 +178,11 @@ async def generate_caption_endpoint(payload: dict):
         increment_konten()
         return {"success": True, "data": result}
     except Exception as e:
-        raise HTTPException(500, f"Caption generation failed: {str(e)}")
+        raise HTTPException(500, detail={"error_code": "CAPTION_GENERATION_FAILED", "error_message": f"Caption generation failed: {str(e)}"})
 
 
 @router.post("/generate-carousel")
-async def generate_carousel(payload: dict):
+async def generate_carousel(payload: dict, user: CurrentUser = Depends(get_current_user_or_dev)):
     """Generate image with text overlay from content"""
     document_id = payload.get("document_id")
     topic = payload.get("topic") or payload.get("selected_topic", "")
@@ -189,14 +190,14 @@ async def generate_carousel(payload: dict):
     hashtags = payload.get("hashtags", [])
 
     if not caption:
-        raise HTTPException(400, "caption is required")
+        raise HTTPException(400, detail={"error_code": "MISSING_CAPTION", "error_message": "caption is required"})
 
     # Rate limit image
     ic = check_image_limit()
     if not ic["allowed"]:
-        raise HTTPException(429, f"Batas image bulan ini sudah habis. Di Free tier hanya 1x trial image.")
+        raise HTTPException(429, detail={"error_code": "IMAGE_LIMIT_EXCEEDED", "error_message": f"Batas image bulan ini sudah habis. Di Free tier hanya 1x trial image."})
 
-    from app.content_engine.image_gen import generate_carousel_storytelling, generate_image
+    from app.content_engine.image_gen import generate_image
 
     topic_title = topic if isinstance(topic, str) else topic.get("title", "")
 
@@ -210,7 +211,7 @@ async def generate_carousel(payload: dict):
 
 
 @router.post("/download-zip")
-async def download_zip(payload: dict):
+async def download_zip(payload: dict, user: CurrentUser = Depends(get_current_user_or_dev)):
     """Download topic, content, hashtags, and image as ZIP"""
     import tempfile, zipfile, shutil
     from pathlib import Path
@@ -271,7 +272,7 @@ from app.content_engine.rag import load_rag, chunk_text
 
 
 @router.post("/topics/agentic")
-async def get_topics_agentic(payload: dict):
+async def get_topics_agentic(payload: dict, user: CurrentUser = Depends(get_current_user_or_dev)):
     """Generate topics using Agentic RAG pipeline (Strategy Agent + Data Agent)"""
     doc_id = payload.get("document_id", "")
     if not doc_id:
@@ -305,7 +306,7 @@ async def get_topics_agentic(payload: dict):
 
 
 @router.post("/generate-caption/agentic")
-async def generate_caption_agentic(payload: dict):
+async def generate_caption_agentic(payload: dict, user: CurrentUser = Depends(get_current_user_or_dev)):
     """Generate caption using Agentic RAG pipeline (Data → Strategy → Reporting Agent)"""
     doc_id = payload.get("document_id", "")
     topic_title = payload.get("topic_title", "")
@@ -390,7 +391,7 @@ async def _sse_topics_stream(text: str, filename: str, chunks: list):
 
 
 @router.get("/topics/agentic/stream")
-async def stream_topics(doc_id: str):
+async def stream_topics(doc_id: str, user: CurrentUser = Depends(get_current_user_or_dev)):
     """SSE stream for Agentic Topic generation with real-time progress."""
     meta_file = UPLOAD_DIR / f"{doc_id}.json"
     if not meta_file.exists():

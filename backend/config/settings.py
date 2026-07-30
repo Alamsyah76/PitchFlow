@@ -89,9 +89,14 @@ class Settings(BaseSettings):
     
     # === CORS Configuration ===
     cors_origins: str = Field(
-        default="http://localhost:3000,http://localhost:8000", 
+        default="http://localhost:3000,http://localhost:3070,http://127.0.0.1:3000,http://127.0.0.1:3070",
         alias="CORS_ORIGINS"
     )
+
+    @property
+    def allowed_origins(self) -> list[str]:
+        """Parse comma-separated CORS origins into a list."""
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
     
     # === File Processing Configuration ===
     max_file_size_mb: int = 100

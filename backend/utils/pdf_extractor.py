@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from utils.logger import get_logger
 
 logger = get_logger(__name__)

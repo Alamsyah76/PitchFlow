@@ -161,6 +161,7 @@ export default function ContentStudioPage() {
   const [isCopied, setIsCopied] = useState(false)
   const [saveToast, setSaveToast] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [hasSaved, setHasSaved] = useState(false)
 
   // Request generation guard: increment on every new request to discard stale responses
   const requestGeneration = useRef(0)
@@ -201,6 +202,7 @@ export default function ContentStudioPage() {
     setErrors({})
     setApiError(null)
     setLoading((s) => ({ ...s, upload: true }))
+    setHasSaved(false)
     try {
       const response = await uploadPdf(file)
       // Guard: discard stale response
@@ -310,6 +312,7 @@ export default function ContentStudioPage() {
     setImageStorytellingError(null)
     setImageGenerationError(null)
     setGeneratedImageUrl(null)
+    setHasGeneratedImage(false)
     setErrors((s) => ({ ...s, caption: undefined, carousel: undefined }))
   }
 
@@ -337,6 +340,7 @@ export default function ContentStudioPage() {
     setImageStorytellingError(null)
     setImageGenerationError(null)
     setGeneratedImageUrl(null)
+    setHasGeneratedImage(false)
     setLoading((s) => ({ ...s, caption: true }))
     setApiError(null)
     const payload: GenerateCaptionRequest = {
@@ -502,6 +506,7 @@ export default function ContentStudioPage() {
       hashtags,
       image_url: generatedImageUrl,
     }, selectedTopic?.title ?? '')
+    setHasSaved(true)
     setIsSaving(false)
     setSaveToast('Project saved to Library')
     window.setTimeout(() => setSaveToast(null), 3000)
@@ -533,6 +538,7 @@ export default function ContentStudioPage() {
       document.body.appendChild(a); a.click(); document.body.removeChild(a)
       URL.revokeObjectURL(url)
       setSaveToast('Downloaded!')
+      setHasSaved(true)
       window.setTimeout(() => setSaveToast(null), 3000)
     } catch { setSaveToast('Download failed') }
     setIsSaving(false)
@@ -546,7 +552,7 @@ export default function ContentStudioPage() {
     { label: 'Topics', status: topics.length > 0 ? 'completed' as const : loading.topics ? 'active' as const : documentId ? 'pending' as const : 'pending' as const },
     { label: 'Caption', status: generatedCaption ? 'completed' as const : loading.caption ? 'active' as const : selectedTopic ? 'pending' as const : 'pending' as const },
     { label: 'Image', status: generatedImageUrl ? 'completed' as const : imageStorytellingLoading ? 'active' as const : generatedCaption ? 'pending' as const : 'pending' as const },
-    { label: 'Save', status: saveToast ? 'completed' as const : isSaving ? 'active' as const : generatedImageUrl ? 'pending' as const : 'pending' as const },
+    { label: 'Save', status: hasSaved ? 'completed' as const : isSaving ? 'active' as const : generatedImageUrl ? 'pending' as const : 'pending' as const },
   ]
 
   return (

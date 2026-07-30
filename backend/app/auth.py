@@ -140,3 +140,53 @@ def get_db_current_user(
 ) -> CurrentUser:
     ensure_user_profile(db, current_user)
     return current_user
+
+
+def _is_dev_mode() -> bool:
+    """Check if running in local development mode (bypass auth)."""
+    import os
+    return os.environ.get("USE_SQLITE_DEV", "").lower() in ("1", "true", "yes") or \
+           os.environ.get("PITCHFLOW_DEV", "").lower() in ("1", "true", "yes")
+
+
+DEV_USER = CurrentUser(
+    id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
+    email="dev@pitchflow.local",
+    role="authenticated",
+    organization_id=None,
+    claims={"sub": "00000000-0000-0000-0000-000000000001", "email": "dev@pitchflow.local", "role": "authenticated"},
+)
+
+
+async def get_current_user_or_dev(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+) -> CurrentUser:
+    """Like get_current_user, but bypasses auth in local dev mode.
+    
+    In production: rejects missing/invalid tokens.
+    In dev mode (PITCHFLOW_DEV/USE_SQLITE_DEV): returns a dummy dev user.
+    """
+    if _is_dev_mode():
+        return DEV_USER
+
+    if credentials is None or credentials.scheme.lower() != "bearer" or not credentials.credentials:
+        raise _auth_error("AUTH_REQUIRED", "Authorization bearer token is required")
+
+    claims = decode_supabase_jwt(credentials.credentials)
+    subject = claims.get("sub")
+
+    try:
+        user_id = uuid.UUID(str(subject))
+    except (TypeError, ValueError) as exc:
+        raise _auth_error("INVALID_TOKEN_SUBJECT", "Authentication token subject is not a valid user id") from exc
+
+    email = claims.get("email") or claims.get("user_metadata", {}).get("email") or ""
+    organization_id = claims.get("organization_id") or claims.get("org_id") or claims.get("app_metadata", {}).get("organization_id")
+
+    return CurrentUser(
+        id=user_id,
+        email=email,
+        role=claims.get("role"),
+        organization_id=str(organization_id) if organization_id else None,
+        claims=claims,
+    )
