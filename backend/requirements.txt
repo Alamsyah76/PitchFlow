@@ -12,3 +12,4 @@ Pillow==11.1.0
 pypdf==5.1.0
 tenacity==9.0.0
 python-multipart==0.0.19
+mangum==0.17.0
