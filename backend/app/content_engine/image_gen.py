@@ -27,7 +27,7 @@ def _extract_points(caption: str, topic: str) -> list:
     return result.get("points", [])[:3]
 
 
-def _truncate_title(title: str, max_chars: int = 45) -> str:
+def _truncate_title(title: str, max_chars: int = 70) -> str:
     """Truncate title to fit DALL-E rendering"""
     if len(title) <= max_chars:
         return title
@@ -40,7 +40,7 @@ def _truncate_title(title: str, max_chars: int = 45) -> str:
 
 def _build_image_prompt(topic_title: str, caption: str, points: list) -> str:
     """GPT generates a relevant scene, then builds full DALL-E prompt with exact text"""
-    short_title = _truncate_title(topic_title, 45)
+    short_title = _truncate_title(topic_title, 65)
 
     # Step 1: GPT generates scene description relevant to the ACTUAL content (not generic)
     scene_resp = client.chat.completions.create(model="gpt-4o-mini",
