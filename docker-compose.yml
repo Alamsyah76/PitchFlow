@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pitchflow
+      POSTGRES_USER: pitchflow
+      POSTGRES_PASSWORD: pitchflow_secret_2024
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - pitchflow-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      USE_SQLITE_DEV: "0"
+      PITCHFLOW_DEV: "0"
+      DATABASE_URL: postgresql://pitchflow:pitchflow_secret_2024@postgres:5432/pitchflow
+      SUPABASE_JWT_SECRET: 3113e0b97fb45120e0ab9105343ed82b9b513b4f519a02b80a07701b21a69995
+      SUPABASE_JWT_AUDIENCE: authenticated
+      SUPABASE_URL: https://xjxilrfwjljqzjxpepzg.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: placeholder
+      SUPABASE_ANON_KEY: placeholder
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      CORS_ORIGINS: https://pitchflow.digital
+      PORT: "8030"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pitchflow-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.pitchflow.digital
+      NEXT_PUBLIC_ENV: production
+      NEXT_PUBLIC_SUPABASE_URL: https://xjxilrfwjljqzjxpepzg.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - pitchflow-net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot-data:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - pitchflow-net
+
+volumes:
+  pgdata:
+  certbot-data:
+
+networks:
+  pitchflow-net:
+    driver: bridge
