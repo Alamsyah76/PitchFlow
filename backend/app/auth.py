@@ -143,7 +143,7 @@ def get_db_current_user(
 
 
 def create_jwt_token(email: str, user_id: Optional[str] = None) -> str:
-    """Generate a JWT token for authenticated users (used after OTP verify)."""
+    """Generate a JWT token valid for 5 minutes."""
     from datetime import datetime, timedelta, timezone
 
     secret = settings.supabase_jwt_secret if settings else "dev-jwt-secret"
@@ -157,9 +157,46 @@ def create_jwt_token(email: str, user_id: Optional[str] = None) -> str:
         "aud": settings.supabase_jwt_audience if settings else "authenticated",
         "role": "authenticated",
         "iat": int(now.timestamp()),
-        "exp": int((now + timedelta(days=7)).timestamp()),
+        "exp": int((now + timedelta(minutes=5)).timestamp()),
+        "jti": str(uuid.uuid4()),  # Unique token ID for blacklist
     }
     return jwt.encode(payload, secret, algorithm="HS256")
+
+
+# In-memory token blacklist (invalidated on logout)
+_blacklisted_jti: set = set()
+
+
+def blacklist_token(token: str) -> None:
+    """Add token to blacklist so it cannot be reused."""
+    try:
+        secret = settings.supabase_jwt_secret if settings else "dev-jwt-secret"
+        claims = jwt.decode(
+            token,
+            secret,
+            algorithms=["HS256"],
+            options={"verify_exp": False, "verify_aud": False},
+        )
+        jti = claims.get("jti")
+        if jti:
+            _blacklisted_jti.add(jti)
+    except Exception:
+        pass
+
+
+def is_token_blacklisted(token: str) -> bool:
+    """Check if token has been blacklisted (logged out)."""
+    try:
+        secret = settings.supabase_jwt_secret if settings else "dev-jwt-secret"
+        claims = jwt.decode(
+            token,
+            secret,
+            algorithms=["HS256"],
+            options={"verify_exp": False, "verify_aud": False},
+        )
+        return claims.get("jti") in _blacklisted_jti
+    except Exception:
+        return False
 
 
 def _is_dev_mode() -> bool:
@@ -191,6 +228,10 @@ async def get_current_user_or_dev(
 
     if credentials is None or credentials.scheme.lower() != "bearer" or not credentials.credentials:
         raise _auth_error("AUTH_REQUIRED", "Authorization bearer token is required")
+
+    # Check blacklist (logout)
+    if is_token_blacklisted(credentials.credentials):
+        raise _auth_error("TOKEN_INVALIDATED", "Token has been invalidated (logout)")
 
     claims = decode_supabase_jwt(credentials.credentials)
     subject = claims.get("sub")

@@ -70,8 +70,13 @@ async def verify_otp_endpoint(payload: dict):
 
 
 @router.post("/logout")
-async def logout():
-    return {"success": True, "message": "Logged out"}
+async def logout(payload: dict):
+    """Logout — blacklist token so it cannot be reused."""
+    from app.auth import blacklist_token
+    token = (payload.get("token") or "").strip()
+    if token:
+        blacklist_token(token)
+    return {"success": True, "message": "Logged out. Token invalidated."}
 
 
 @router.post("/admin-login")
