@@ -48,11 +48,12 @@ async def report_summary():
         # Total stats
         total_sent = len([e for e in entries if e["status"] == "sent"])
         total_failed = len([e for e in entries if e["status"] == "failed"])
+        total_bounced = len([e for e in entries if e["status"] == "bounced"])
 
         # Today stats
         today_entries = [e for e in entries if e["timestamp"].startswith(today)]
         today_sent = len([e for e in today_entries if e["status"] == "sent"])
-        today_failed = len([e for e in today_entries if e["status"] == "failed"])
+        today_failed = len([e for e in today_entries if e["status"] in ("failed", "bounced")])
 
         # Open stats
         open_stats = get_open_stats()
@@ -68,18 +69,23 @@ async def report_summary():
         contacts = load_merged_contacts()
         total_contacts = len(contacts)
 
+        # Pending = belum dikirim & tidak gagal/bounce
+        delivered = total_sent + total_failed + total_bounced
+        pending = max(0, total_contacts - delivered)
+
         return {
             "success": True,
             "data": {
                 "total_sent": total_sent,
                 "total_failed": total_failed,
+                "total_bounced": total_bounced,
                 "today_sent": today_sent,
                 "today_failed": today_failed,
                 "total_opens": total_opens,
                 "unique_opens": unique_opens,
                 "open_rate": open_rate,
                 "total_contacts": total_contacts,
-                "pending": max(0, total_contacts - total_sent),
+                "pending": pending,
                 "blog_posts_sent": blog.get("total_sent", 0),
                 "last_checked": blog.get("last_checked", "never"),
             },
@@ -107,7 +113,7 @@ async def report_timeline(days: int = 30):
             d = e["timestamp"][:10]
             if e["status"] == "sent":
                 daily_sent[d] += 1
-            elif e["status"] == "failed":
+            elif e["status"] in ("failed", "bounced"):
                 daily_failed[d] += 1
 
         # Aggregate opens by date

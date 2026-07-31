@@ -9,7 +9,7 @@ import {
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8042'
 
 const COLORS = {
-  primary: '#F48120',
+  primary: '#0056b3',
   success: '#22C55E',
   danger: '#EF4444',
   warning: '#F59E0B',
@@ -18,7 +18,7 @@ const COLORS = {
   light: '#F1F5F9',
 }
 
-const PIE_COLORS = ['#22C55E', '#F48120', '#EF4444', '#94A3B8']
+const PIE_COLORS = ['#22C55E', '#0056b3', '#EF4444', '#94A3B8']
 
 interface Summary {
   total_sent: number; total_failed: number; today_sent: number; today_failed: number
@@ -64,8 +64,8 @@ export default function DashboardRoute() {
 
   const sentVsPending = summary ? [
     { name: 'Sent', value: summary.total_sent },
-    { name: 'Pending', value: Math.max(0, summary.total_contacts - summary.total_sent) },
-    { name: 'Failed', value: summary.total_failed },
+    { name: 'Pending', value: summary.pending },
+    { name: 'Failed', value: summary.total_failed + (summary.total_bounced || 0) },
     { name: 'Open (unique)', value: summary.unique_opens },
   ] : []
 
@@ -76,7 +76,7 @@ export default function DashboardRoute() {
       <AppShell activeRoute="/dashboard">
         <div className="flex h-[70vh] items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#F48120] border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0056b3] border-t-transparent" />
             <p className="text-sm text-slate-500">Loading dashboard...</p>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function DashboardRoute() {
                   onClick={() => setRange(d)}
                   className={`rounded-md px-3 py-1 text-xs font-medium transition ${
                     range === d
-                      ? 'bg-[#F48120] text-white'
+                      ? 'bg-[#0056b3] text-white'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -245,11 +245,13 @@ export default function DashboardRoute() {
                     <td className="py-2.5 pr-4 font-medium text-slate-700">{a.name || '-'}</td>
                     <td className="py-2.5 pr-4 text-slate-600">{a.email}</td>
                     <td className="py-2.5 pr-4">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        a.status === 'sent' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                      }`}>
-                        {a.status === 'sent' ? '✅ Sent' : '❌ Failed'}
-                      </span>
+                      {a.status === 'sent' ? (
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">✅ Sent</span>
+                      ) : a.status === 'bounced' ? (
+                        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">❌ Bounced</span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">❌ Failed</span>
+                      )}
                     </td>
                     <td className="py-2.5 text-xs text-slate-400 max-w-[200px] truncate">{a.error || '-'}</td>
                   </tr>
