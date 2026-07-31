@@ -24,6 +24,7 @@ interface Summary {
   total_sent: number; total_failed: number; today_sent: number; today_failed: number
   total_opens: number; unique_opens: number; open_rate: number
   total_contacts: number; pending: number; blog_posts_sent: number
+  total_bounced?: number
   last_checked: string
 }
 
@@ -109,39 +110,7 @@ export default function DashboardRoute() {
           </button>
         </div>
 
-        {/* ── KPI Cards ── */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard
-            title="Total Sent"
-            value={fmt(summary?.total_sent || 0)}
-            subtitle={`${summary?.today_sent || 0} today`}
-            color={COLORS.success}
-            icon={<SentIcon />}
-          />
-          <KpiCard
-            title="Open Rate"
-            value={`${summary?.open_rate || 0}%`}
-            subtitle={`${summary?.unique_opens || 0} unique opens`}
-            color={COLORS.primary}
-            icon={<OpenIcon />}
-          />
-          <KpiCard
-            title="Total Contacts"
-            value={fmt(summary?.total_contacts || 0)}
-            subtitle={`${summary?.pending || 0} pending`}
-            color={COLORS.dark}
-            icon={<ContactIcon />}
-          />
-          <KpiCard
-            title="Blog Posts"
-            value={fmt(summary?.blog_posts_sent || 0)}
-            subtitle={`Last checked: ${summary?.last_checked?.split('T')[0] || 'never'}`}
-            color={COLORS.warning}
-            icon={<BlogIcon />}
-          />
-        </div>
-
-        {/* ── Content Studio Panel ── */}
+        {/* ── Content Studio Panel (top) ── */}
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -166,6 +135,47 @@ export default function DashboardRoute() {
               <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_saved_contents || 0)}</p>
               <p className="mt-1 text-xs text-slate-400">Captions generated</p>
             </div>
+          </div>
+        </div>
+
+        {/* ── Email Campaign Section ── */}
+        <div className="pt-2">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">📧 Email Campaign</h3>
+              <p className="text-xs text-slate-400">Campaign performance &amp; delivery stats</p>
+            </div>
+            <a href="/email-campaign" className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">Open Campaign →</a>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard
+              title="Total Sent"
+              value={fmt(summary?.total_sent || 0)}
+              subtitle={`${summary?.today_sent || 0} today`}
+              color={COLORS.success}
+              icon={<SentIcon />}
+            />
+            <KpiCard
+              title="Open Rate"
+              value={`${summary?.open_rate || 0}%`}
+              subtitle={`${summary?.unique_opens || 0} unique opens`}
+              color={COLORS.primary}
+              icon={<OpenIcon />}
+            />
+            <KpiCard
+              title="Total Contacts"
+              value={fmt(summary?.total_contacts || 0)}
+              subtitle={`${summary?.pending || 0} pending`}
+              color={COLORS.dark}
+              icon={<ContactIcon />}
+            />
+            <KpiCard
+              title="Blog Posts"
+              value={fmt(summary?.blog_posts_sent || 0)}
+              subtitle={`Last checked: ${summary?.last_checked?.split('T')[0] || 'never'}`}
+              color={COLORS.warning}
+              icon={<BlogIcon />}
+            />
           </div>
         </div>
 
