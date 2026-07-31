@@ -230,7 +230,6 @@ export default function DashboardRoute() {
               <thead>
                 <tr className="border-b border-slate-200 text-xs uppercase text-slate-500">
                   <th className="pb-2 pr-4 font-medium">Time</th>
-                  <th className="pb-2 pr-4 font-medium">Name</th>
                   <th className="pb-2 pr-4 font-medium">Email</th>
                   <th className="pb-2 pr-4 font-medium">Status</th>
                   <th className="pb-2 font-medium">Error</th>
@@ -238,11 +237,10 @@ export default function DashboardRoute() {
               </thead>
               <tbody>
                 {activities.length === 0 ? (
-                  <tr><td colSpan={5} className="py-8 text-center text-sm text-slate-400">No activity yet</td></tr>
+                  <tr><td colSpan={4} className="py-8 text-center text-sm text-slate-400">No activity yet</td></tr>
                 ) : activities.map((a, i) => (
                   <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-2.5 pr-4 text-xs text-slate-500 whitespace-nowrap">{a.timestamp?.slice(11, 19)}</td>
-                    <td className="py-2.5 pr-4 font-medium text-slate-700">{a.name || '-'}</td>
                     <td className="py-2.5 pr-4 text-slate-600">{a.email}</td>
                     <td className="py-2.5 pr-4">
                       {a.status === 'sent' ? (
