@@ -162,10 +162,10 @@ def _send_otp_email(to_email: str, to_name: str, code: str):
         import smtplib
         from email.mime.text import MIMEText
 
-        msg = MIMEText(f"Halo {to_name},\n\nKode OTP kamu: {code}\n\nKode berlaku 10 menit.\n\n— PitchFlow", "plain", "utf-8")
+        msg = MIMEText(f"Hello {to_name},\n\nYour PitchFlow OTP code: {code}\n\nThis code is valid for 10 minutes.\n\n— PitchFlow", "plain", "utf-8")
         msg["From"] = f"{sender_name} <{sender_email}>"
         msg["To"] = to_email
-        msg["Subject"] = f"Kode OTP PitchFlow: {code}"
+        msg["Subject"] = f"PitchFlow OTP: {code}"
 
         with smtplib.SMTP_SSL(smtp_host, smtp_port) as s:
             s.login(smtp_user, smtp_pass)
