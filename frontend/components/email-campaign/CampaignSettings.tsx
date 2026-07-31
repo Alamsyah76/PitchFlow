@@ -15,6 +15,20 @@ type Settings = {
   imap_port: number
 }
 
+// Field must be OUTSIDE the component — defining it inside causes
+// remount on every keystroke → input loses focus after 1 char.
+function Field({ label, value, onChange, type = 'text', placeholder = '', hint = '' }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; hint?: string }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">{label}</label>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none" />
+      {hint && <p className="mt-1 text-[10px] text-slate-400">{hint}</p>}
+    </div>
+  )
+}
+
 export default function CampaignSettings({ onBack }: { onBack?: () => void }) {
   const [settings, setSettings] = useState<Settings>({
     daily_limit: 10, sender_name: '', sender_email: '',
@@ -51,16 +65,6 @@ export default function CampaignSettings({ onBack }: { onBack?: () => void }) {
   }
 
   if (loading) return <div className="flex items-center justify-center py-16"><div className="h-6 w-6 animate-spin rounded-full border-2 border-[#0056b3] border-t-transparent" /></div>
-
-  const Field = ({ label, value, onChange, type = 'text', placeholder = '', hint = '' }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; hint?: string }) => (
-    <div>
-      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none" />
-      {hint && <p className="mt-1 text-[10px] text-slate-400">{hint}</p>}
-    </div>
-  )
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
