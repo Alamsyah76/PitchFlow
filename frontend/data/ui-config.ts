@@ -13,8 +13,8 @@ export const uiConfig = {
       { label: 'Dashboard', icon: 'layout-dashboard', route: '/dashboard' },
       { label: 'Content Studio', icon: 'sparkles', route: '/content-studio', active: true },
       { label: 'Email Campaign', icon: 'mail', route: '/email-campaign' },
-      { label: 'History', icon: 'history', route: '/history' },
-      { label: 'Saved', icon: 'bookmark', route: '/saved' },
+      { label: 'Library', icon: 'book-open', route: '/library' },
+      { label: 'Pricing', icon: 'tag', route: '/pricing' },
       { label: 'Settings', icon: 'settings', route: '/settings' }
     ],
     recentGenerations: [

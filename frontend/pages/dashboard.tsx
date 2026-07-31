@@ -1,5 +1,6 @@
 'use client'
 import AppShell from '../components/app-shell/AppShell'
+import { Sparkle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -115,8 +116,11 @@ export default function DashboardRoute() {
           <div className="absolute right-24 -bottom-10 h-32 w-32 rounded-full bg-white/10 blur-xl" />
           <div className="relative flex flex-wrap items-center justify-between gap-4">
             <div>
+              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white ring-1 ring-white/25 backdrop-blur">
+                <Sparkle className="h-3 w-3" /> AI Content Engine
+              </div>
               <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="mt-1 text-sm text-white/75">Overview of Content Studio &amp; Email Campaign performance</p>
+              <p className="mt-1 text-sm text-white/75">Turn documents into publish-ready content — track every send</p>
             </div>
             <button
               onClick={fetchAll}

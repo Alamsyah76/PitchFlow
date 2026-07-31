@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import {
-  Bookmark,
+  BookOpen,
   FileText,
-  History,
   Home,
   Image,
   LayoutDashboard,
   Mail,
   Settings,
-  Sparkles
+  Sparkles,
+  Tag
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -16,15 +16,15 @@ import { cn } from '../../lib/utils'
 import { uiConfig } from '../../data/ui-config'
 
 const iconMap = {
-  bookmark: Bookmark,
+  'book-open': BookOpen,
   'file-text': FileText,
-  history: History,
   home: Home,
   image: Image,
   mail: Mail,
   'layout-dashboard': LayoutDashboard,
   settings: Settings,
-  sparkles: Sparkles
+  sparkles: Sparkles,
+  tag: Tag
 }
 
 type SidebarProps = {

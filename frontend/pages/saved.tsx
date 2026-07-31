@@ -1,11 +1,14 @@
 import AppShell from '../components/app-shell/AppShell'
+import ComingSoon from '../components/ComingSoon'
 
 export default function SavedRoute() {
   return (
     <AppShell activeRoute="/saved">
-      <main className="flex min-h-[360px] items-center justify-center text-center">
-        <p className="text-base font-medium text-slate-600">This premium feature is under development.</p>
-      </main>
+      <ComingSoon
+        icon="🔖"
+        title="Saved Content"
+        description="Your bookmarked captions, images, and campaign drafts will live here. Quickly revisit any content you've created without re-generating."
+      />
     </AppShell>
   )
 }
