@@ -65,6 +65,11 @@ def _read_rows_xlsx(wb, sheet_name):
 
 def _read_rows(path):
     """Generic row reader — delegates to format-specific function"""
+    # CSV: parse directly (no workbook needed)
+    if path.suffix.lower() == ".csv":
+        yield from _read_rows_csv(path)
+        return
+
     wb = _open_workbook(path)
     sheet_name = _get_sheet(wb)
     if not sheet_name:
@@ -78,6 +83,24 @@ def _read_rows(path):
         yield from _read_rows_xlsx(wb, sheet_name)
 
     wb.close() if hasattr(wb, 'close') else None
+
+
+def _read_rows_csv(path):
+    """Yield (name, email, phone, job_title, company) from .csv file"""
+    import csv
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader, None)  # skip header (Nama, Email, ...)
+        next(reader, None)  # skip sample row
+        for row in reader:
+            if not row or not row[0].strip():
+                continue
+            name = row[0].strip()
+            email = row[1].strip() if len(row) > 1 else ""
+            phone = row[2].strip() if len(row) > 2 else ""
+            job_title = row[3].strip() if len(row) > 3 else ""
+            company = row[4].strip() if len(row) > 4 else ""
+            yield name, email, phone, job_title, company
 
 
 def read_namecards():

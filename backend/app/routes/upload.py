@@ -67,6 +67,7 @@ async def upload_contacts_file(file: UploadFile = File(...)):
         # Simpan dengan ekstensi asli — biarkan XLS_FILE tetap .xls untuk backward compat
         # Tapi simpan juga file asli dengan ekstensi aslinya
         from modules.config import REPORT_DIR
+        REPORT_DIR.mkdir(parents=True, exist_ok=True)   # Pastikan folder ada
         saved_path = REPORT_DIR / f"uploaded_contacts{ext}"
         saved_path.write_bytes(content)
 
