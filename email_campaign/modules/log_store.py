@@ -22,6 +22,19 @@ def load_log():
     return sent
 
 
+def load_bounced():
+    """Return set of email addresses that BOUNCED (status='bounced')."""
+    bounced = set()
+    if LOG_FILE.exists():
+        with open(LOG_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader, None)  # skip header
+            for row in reader:
+                if len(row) >= 5 and row[4].strip().lower() == "bounced":
+                    bounced.add(row[1].strip().lower())
+    return bounced
+
+
 def load_sent_log_detailed():
     """Return dict of {email_lower: {timestamp, name, template_id}} for SENT emails"""
     sent = {}

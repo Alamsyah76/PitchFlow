@@ -26,6 +26,18 @@ async def preview_contacts(limit: int = 20, q: str = ""):
             from . import load_sent_log_detailed
             sent_log = load_sent_log_detailed()
         except: pass
+        bounced = set()
+        try:
+            from modules.log_store import load_bounced
+            bounced = load_bounced()
+        except: pass
+
+        def _status(c):
+            e = c.get("email", "").strip().lower()
+            if e in bounced:
+                return "bounced"
+            return "sent" if e in sent_log else "pending"
+
         if q.strip():
             ql = q.strip().lower()
             matched = [c for c in all_c
@@ -35,14 +47,14 @@ async def preview_contacts(limit: int = 20, q: str = ""):
             preview = matched[:limit]
             return {"success": True, "data": {"total_pending": len(matched), "preview": [
                 {"name": c["name"], "email": c["email"], "company": c.get("company", ""), "job_title": c.get("job_title", ""),
-                 "status": "sent" if c.get("email","").strip().lower() in sent_log else "pending",
+                 "status": _status(c),
                  "last_template": sent_log.get(c.get("email","").strip().lower(), {}).get("template_id", "")}
                 for c in preview]}}
         else:
             preview = all_c[:limit]
             return {"success": True, "data": {"total_pending": len(all_c), "preview": [
                 {"name": c["name"], "email": c["email"], "company": c.get("company", ""), "job_title": c.get("job_title", ""),
-                 "status": "sent" if c.get("email","").strip().lower() in sent_log else "pending",
+                 "status": _status(c),
                  "last_template": sent_log.get(c.get("email","").strip().lower(), {}).get("template_id", "")}
                 for c in preview]}}
     except Exception as e:

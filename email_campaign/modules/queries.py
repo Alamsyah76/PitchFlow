@@ -51,25 +51,31 @@ def get_all_contacts_raw():
 
 
 def get_all_pending():
-    """Return pending contacts (merged + manual, excluding already-sent)"""
+    """Return pending contacts (merged + manual, excluding already-sent AND bounced)"""
     load_env()
     merged = load_merged_contacts()
     sent = load_log()
     sent_set = {e.strip().lower() for e in sent}
+    from modules.log_store import load_bounced
+    bounced_set = load_bounced()
     extra = load_extra()
 
     pending = []
     test_email_lower = {e.strip().lower() for e in TEST_EMAILS}
 
+    def _excluded(email_lower):
+        """Excluded if already sent or bounced (unless test email)"""
+        return (email_lower in sent_set or email_lower in bounced_set) and email_lower not in test_email_lower
+
     for c in merged:
         if is_valid_email(c.get("email", "")):
             email_lower = c["email"].strip().lower()
-            if email_lower not in sent_set or email_lower in test_email_lower:
+            if not _excluded(email_lower):
                 pending.append(c)
 
     for c in extra.get("manual", []):
         email_lower = c.get("email", "").strip().lower()
-        if (email_lower not in sent_set or email_lower in test_email_lower) and is_valid_email(c.get("email", "")):
+        if not _excluded(email_lower) and is_valid_email(c.get("email", "")):
             pending.append(c)
 
     return pending

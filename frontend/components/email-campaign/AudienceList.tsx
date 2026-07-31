@@ -9,8 +9,8 @@ type Props = {
   searchQ: string
   loading: boolean
   status: any
-  filter: 'all' | 'pending' | 'sent'
-  onFilterChange: (f: 'all' | 'pending' | 'sent') => void
+  filter: 'all' | 'pending' | 'sent' | 'bounced'
+  onFilterChange: (f: 'all' | 'pending' | 'sent' | 'bounced') => void
   onSearch: (q: string) => void
   onToggle: (i: number) => void
   onSelectAll: () => void
@@ -20,13 +20,15 @@ type Props = {
   onBack: () => void
   onReview: () => void
   onAddClick?: () => void
+  onScanBounces?: () => void
+  scanningBounces?: boolean
 }
 
-export default function AudienceList({ contacts, selectedIdx, searchQ, loading, status, filter, onFilterChange, onSearch, onToggle, onSelectAll, onUpload, onEdit, onDelete, onBack, onReview, onAddClick }: Props) {
+export default function AudienceList({ contacts, selectedIdx, searchQ, loading, status, filter, onFilterChange, onSearch, onToggle, onSelectAll, onUpload, onEdit, onDelete, onBack, onReview, onAddClick, onScanBounces, scanningBounces }: Props) {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
-  const filtered = contacts.filter(c => filter === 'all' || (filter === 'pending' ? c.status !== 'sent' : c.status === 'sent'));
+  const filtered = contacts.filter(c => filter === 'all' || (filter === 'pending' ? c.status !== 'sent' && c.status !== 'bounced' : c.status === filter));
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages - 1);
   const pageContacts = filtered.slice(safePage * pageSize, (safePage + 1) * pageSize);
@@ -67,15 +69,22 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Upload
           </label>
+          {onScanBounces && (
+            <button onClick={onScanBounces} disabled={scanningBounces}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-medium text-red-600 shadow-sm transition-colors hover:bg-red-100 disabled:opacity-50">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {scanningBounces ? 'Scanning...' : 'Scan Bounces'}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Filter tabs */}
       <div className="flex items-center gap-1 border-b border-slate-100 px-6 py-2">
-        {(['all', 'pending', 'sent'] as const).map((f: 'all' | 'pending' | 'sent') => (
+        {(['all', 'pending', 'sent', 'bounced'] as const).map((f: 'all' | 'pending' | 'sent' | 'bounced') => (
           <button key={f} onClick={() => onFilterChange(f)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${filter === f ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}>
-            {f === 'all' ? 'All' : f === 'pending' ? '⏳ Pending' : '✅ Sent'}
+            {f === 'all' ? 'All' : f === 'pending' ? '⏳ Pending' : f === 'sent' ? '✅ Sent' : '❌ Bounced'}
           </button>
         ))}
       </div>
@@ -140,7 +149,12 @@ export default function AudienceList({ contacts, selectedIdx, searchQ, loading, 
                     <td className="px-4 py-3.5 text-slate-600 truncate max-w-[250px]">{c.email}</td>
                     <td className="px-4 py-3.5 text-slate-500 truncate max-w-[180px]">{c.company}</td>
                     <td className="px-4 py-3.5">
-                      {c.status === 'sent' ? (
+                      {c.status === 'bounced' ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 ring-1 ring-red-200">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                          Bounced
+                        </span>
+                      ) : c.status === 'sent' ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                           Sent

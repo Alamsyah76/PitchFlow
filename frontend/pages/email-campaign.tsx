@@ -53,7 +53,8 @@ export default function EmailCampaignRoute() {
   const [viewTpl, setViewTpl] = useState<any>(null)
   const [showTplPreview, setShowTplPreview] = useState(false)
   const [senderCfg, setSenderCfg] = useState<any>({name:'',email:'',company:'',logo_b64:''})
-  const [filter, setFilter] = useState<'all' | 'pending' | 'sent'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'sent' | 'bounced'>('all')
+  const [scanningBounces, setScanningBounces] = useState(false)
   const searchTimer = useRef<NodeJS.Timeout|null>(null)
 
   // ── Data ──
@@ -120,6 +121,7 @@ export default function EmailCampaignRoute() {
   async function saveEdit() { if(editIdx===null) return; try { await fetch(`${API}/api/email-campaign/contacts/edit`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({index:editIdx,name:editName,email:editEmail})}) } catch {}; setEditIdx(null) }
   async function deleteContact(email:string){if(!confirm('Hapus kontak ini?'))return; try{await fetch(`${API}/api/email-campaign/contacts/delete-by-email`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});await fetchContacts();await fetchStatus()}catch{}}
   async function handleUpload(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{const r=await fetch(`${API}/api/email-campaign/upload`,{method:'POST',body:fd});const d=await r.json();if(d.success){setSearchQ('');await fetchContacts('');await fetchStatus()}}catch{}}
+  async function handleScanBounces(){setScanningBounces(true);try{const r=await fetch(`${API}/api/email-campaign/bounces/scan`,{method:'POST'});const d=await r.json();alert(d.message||(d.success?'Bounce scan done':'Scan failed'));if(d.success){await fetchContacts('');await fetchStatus();await fetchLog()}}catch{alert('Gagal terhubung ke server')}setScanningBounces(false)}
   async function handleAddManual(data:{name:string;email:string;phone:string;job_title:string;company:string}) {
     setAddError('')
     try {
@@ -214,7 +216,7 @@ export default function EmailCampaignRoute() {
           <StepProgress step={step} setStep={setStep} />
 
           {step===1 && <TemplateList templates={templates} activeTplId={activeTplId} onActivate={activateTpl} onEdit={openEditor} onView={(t)=>{setViewTpl(t);setShowTplPreview(true)}} onDelete={deleteTpl} onNew={()=>{setEditTpl(null);setShowEditor(true);fetchSenderCfg()}} onNext={()=>setStep(2)} activeTpl={activeTpl} />}
-          {step===2 && <AudienceList contacts={contacts} selectedIdx={selectedIdx} searchQ={searchQ} loading={loading} status={status} filter={filter} onFilterChange={setFilter} onSearch={setSearchQ} onToggle={toggleSelect} onSelectAll={selectAll} onUpload={handleUpload} onEdit={openEdit} onDelete={deleteContact} onBack={()=>setStep(1)} onReview={()=>{setStep(3); setSendResult('')}} onAddClick={()=>{setAddError('');setShowAdd(true)}} />}
+          {step===2 && <AudienceList contacts={contacts} selectedIdx={selectedIdx} searchQ={searchQ} loading={loading} status={status} filter={filter} onFilterChange={setFilter} onSearch={setSearchQ} onToggle={toggleSelect} onSelectAll={selectAll} onUpload={handleUpload} onEdit={openEdit} onDelete={deleteContact} onBack={()=>setStep(1)} onReview={()=>{setStep(3); setSendResult('')}} onAddClick={()=>{setAddError('');setShowAdd(true)}} onScanBounces={handleScanBounces} scanningBounces={scanningBounces} />}
           {step===3 && <ReviewSend activeTpl={activeTpl} selectedCount={selectedIdx.size} sending={sending} sendResult={sendResult} onBack={()=>{setStep(2); setSendResult('')}} onSend={sendSelected} />}
           {step===4 && <LogView logs={logs} API={API} onClear={()=>{fetchLog();fetchStatus();fetchContacts()}} />}
         </div>
