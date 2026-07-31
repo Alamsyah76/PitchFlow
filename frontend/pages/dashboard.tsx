@@ -155,47 +155,76 @@ export default function DashboardRoute() {
         <div className="pt-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">📧 Email Campaign</h3>
+              <h3 className="text-lg font-semibold text-slate-900">📧 Email Campaign</h3>
               <p className="text-xs text-slate-400">Campaign performance &amp; delivery stats</p>
             </div>
             <a href="/email-campaign" className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">Open Campaign →</a>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <KpiCardPremium
               title="Total Sent"
               value={fmt(summary?.total_sent || 0)}
-              subtitle={`${summary?.today_sent || 0} today`}
-              color={COLORS.success}
+              subtitle={`${summary?.today_sent || 0} sent today`}
               icon={<SentIcon />}
+              accent="from-emerald-500 to-teal-600"
+              badge="Delivered"
             />
-            <KpiCard
+            <KpiCardPremium
               title="Open Rate"
               value={`${summary?.open_rate || 0}%`}
               subtitle={`${summary?.unique_opens || 0} unique opens`}
-              color={COLORS.primary}
               icon={<OpenIcon />}
+              accent="from-[#0056b3] to-[#003d7a]"
+              badge={summary?.open_rate !== undefined && summary.open_rate > 0 ? "Tracking on" : "Awaiting opens"}
             />
-            <KpiCard
-              title="Click Rate (CTR)"
+            <KpiCardPremium
+              title="Click Rate"
               value={`${summary?.ctr || 0}%`}
               subtitle={`${summary?.unique_clicks || 0} unique clicks`}
-              color={COLORS.warning}
               icon={<ClickIcon />}
+              accent="from-violet-500 to-purple-700"
+              badge="Engagement"
             />
-            <KpiCard
+            <KpiCardPremium
               title="Bounce Rate"
               value={`${summary?.bounce_rate || 0}%`}
               subtitle={`${summary?.total_bounced || 0} bounced`}
-              color={COLORS.danger}
               icon={<BounceIcon />}
+              accent="from-rose-500 to-red-600"
+              badge={summary?.bounce_rate && summary.bounce_rate > 20 ? "⚠️ High" : "Healthy"}
             />
-            <KpiCard
-              title="Total Contacts"
-              value={fmt(summary?.total_contacts || 0)}
-              subtitle={`${summary?.pending || 0} pending`}
-              color={COLORS.dark}
-              icon={<ContactIcon />}
-            />
+          </div>
+
+          {/* Audience summary strip */}
+          <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Total Contacts</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-slate-900">{fmt(summary?.total_contacts || 0)}</span>
+                <span className="text-xs text-slate-400">all</span>
+              </div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Pending</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-amber-600">{fmt(summary?.pending || 0)}</span>
+                <span className="text-xs text-slate-400">to send</span>
+              </div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Delivered</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-emerald-600">{fmt((summary?.total_sent || 0) - (summary?.total_bounced || 0))}</span>
+                <span className="text-xs text-slate-400">ok</span>
+              </div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Failed + Bounced</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-rose-600">{fmt((summary?.total_failed || 0) + (summary?.total_bounced || 0))}</span>
+                <span className="text-xs text-slate-400">undeliverable</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -393,19 +422,28 @@ export default function DashboardRoute() {
 
 // ── Sub-components ──
 
-function KpiCard({ title, value, subtitle, color, icon }: {
-  title: string; value: string; subtitle: string; color: string; icon: React.ReactNode
+function KpiCardPremium({ title, value, subtitle, icon, accent, badge }: {
+  title: string; value: string; subtitle: string; icon: React.ReactNode; accent: string; badge?: string
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500">{title}</p>
-          <p className="mt-1.5 text-2xl font-bold text-slate-900">{value}</p>
-          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+    <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${accent} p-[1px] shadow-sm transition hover:shadow-md`}>
+      <div className="flex h-full flex-col rounded-[11px] bg-white p-4">
+        <div className="flex items-start justify-between">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">{title}</p>
+          <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${accent} text-white shadow-sm`}>
+            {icon}
+          </div>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: color + '15' }}>
-          <div style={{ color }}>{icon}</div>
+        <p className="mt-2 text-2xl font-bold text-slate-900 leading-none">{value}</p>
+        <div className="mt-2 flex items-center justify-between">
+          <p className="text-[11px] text-slate-400">{subtitle}</p>
+          {badge && (
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              badge.includes('⚠️') ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {badge}
+            </span>
+          )}
         </div>
       </div>
     </div>
