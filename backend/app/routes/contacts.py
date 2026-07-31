@@ -36,6 +36,12 @@ async def add_manual_contact(contact: ManualContact):
         except Exception:
             pass
         extra.setdefault("manual", []).append(contact.model_dump())
+        # Tambah added_at timestamp untuk audience growth
+        try:
+            from datetime import datetime
+            extra["manual"][-1]["added_at"] = datetime.now().isoformat(timespec="seconds")
+        except Exception:
+            pass
         save_extra(extra)
         return {"success": True, "message": f"Contact {contact.name} added manually"}
     except HTTPException:

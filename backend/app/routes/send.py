@@ -73,6 +73,22 @@ def _build_smtp_config() -> dict:
     }
 
 
+def _wrap_links(html: str, tracking_base: str, email: str, template_id: str) -> str:
+    """Rewrite <a href> links to route through click tracking redirect."""
+    import re
+    from urllib.parse import quote
+
+    def _repl(m):
+        href = m.group(1)
+        # Skip tracking links already present / mailto / anchors
+        if href.startswith(("mailto:", "#", "data:")) or "/track/click" in href:
+            return m.group(0)
+        new = f"{tracking_base}/api/email-campaign/track/click?url={quote(href)}&email={quote(email)}&template_id={quote(template_id)}"
+        return f'<a href="{new}"'
+
+    return re.sub(r'<a\s+href="([^"]+)"', _repl, html, flags=re.IGNORECASE)
+
+
 def _send_to_contacts(selected, smtp_config, sender):
     """Shared send logic — return (sent_count, fail_count, errors)"""
     tpl_subject, tpl_body, tpl_sections, tpl_logo, tpl_cc = get_active_template()
@@ -108,9 +124,12 @@ def _send_to_contacts(selected, smtp_config, sender):
                     logo_b64=logo_b64)
 
         # Append open tracking pixel
-        track_url = smtp_config.get("tracking_base_url", "http://localhost:8040")
+        track_url = smtp_config.get("tracking_base_url", "http://localhost:8030")
         pixel = f'<img src="{track_url}/api/email-campaign/track/open?email={contact["email"]}&template_id={active_tid}" width="1" height="1" style="display:none" />'
         html = html.replace("</body>", f"{pixel}</body>") if "</body>" in html else html + pixel
+
+        # Click tracking — rewrite all <a href> links
+        html = _wrap_links(html, track_url, contact["email"], active_tid)
 
         ok, err = send_email(smtp_config, contact["email"], contact["name"], html,
                              subject=tpl_subject, attachments=attachments or None, cc_email=tpl_cc)

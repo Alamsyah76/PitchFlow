@@ -61,6 +61,16 @@ async def report_summary():
         unique_opens = open_stats.get("unique_opens", 0)
         open_rate = round((unique_opens / total_sent * 100), 1) if total_sent > 0 else 0
 
+        # Click stats
+        try:
+            from modules.click_tracking import get_click_stats
+            click_stats = get_click_stats()
+            total_clicks = click_stats.get("total_clicks", 0)
+            unique_clicks = click_stats.get("unique_clicks", 0)
+            ctr = round((unique_clicks / total_sent * 100), 1) if total_sent > 0 else 0
+        except Exception:
+            total_clicks = unique_clicks = ctr = 0
+
         # Bounce rate — bounced / (sent + bounced) * 100
         bounce_rate = round((total_bounced / (total_sent + total_bounced) * 100), 1) if (total_sent + total_bounced) > 0 else 0
 
@@ -88,6 +98,9 @@ async def report_summary():
                 "unique_opens": unique_opens,
                 "open_rate": open_rate,
                 "bounce_rate": bounce_rate,
+                "total_clicks": total_clicks,
+                "unique_clicks": unique_clicks,
+                "ctr": ctr,
                 "total_contacts": total_contacts,
                 "pending": pending,
                 "blog_posts_sent": blog.get("total_sent", 0),
@@ -223,6 +236,54 @@ async def report_campaigns(limit: int = 10):
         return {"success": True, "data": {"campaigns": campaigns[:limit]}}
     except Exception as e:
         logger.error(f"Report campaigns error: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/report/audience-growth")
+async def report_audience_growth(days: int = 30):
+    """Audience growth — new contacts added per day (cumulative)."""
+    try:
+        from datetime import datetime, timedelta, date
+        from collections import defaultdict
+        from modules.storage import load_merged_contacts, load_extra
+
+        contacts = load_merged_contacts()
+        extra = load_extra()
+        all_c = list(contacts) + extra.get("manual", [])
+
+        today_dt = date.today()
+        date_range = [(today_dt - timedelta(days=i)).isoformat() for i in range(days - 1, -1, -1)]
+
+        # Fallback date untuk kontak lama tanpa added_at — pakai mtime file
+        from modules.config import ALL_CONTACTS_FILE
+        fallback_day = None
+        try:
+            if ALL_CONTACTS_FILE.exists():
+                from datetime import datetime as _dt
+                fallback_day = _dt.fromtimestamp(ALL_CONTACTS_FILE.stat().st_mtime).strftime("%Y-%m-%d")
+        except Exception:
+            fallback_day = None
+
+        daily_new = defaultdict(int)
+        for c in all_c:
+            added = c.get("added_at", "")
+            if not added and fallback_day:
+                added = fallback_day
+            if added:
+                day = str(added)[:10]
+                if day >= date_range[0] and day <= today_dt.isoformat():
+                    daily_new[day] += 1
+
+        # Cumulative growth
+        cumulative = 0
+        growth = []
+        for d in date_range:
+            cumulative += daily_new.get(d, 0)
+            growth.append({"date": d, "new": daily_new.get(d, 0), "total": cumulative})
+
+        return {"success": True, "data": {"growth": growth, "days": days}}
+    except Exception as e:
+        logger.error(f"Audience growth error: {e}")
         return {"success": False, "error": str(e)}
 
 

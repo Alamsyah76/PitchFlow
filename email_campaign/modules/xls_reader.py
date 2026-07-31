@@ -129,12 +129,14 @@ def merge_xls_into_all(filepath):
     Return (total_baru, total_keseluruhan)
     """
     import json
+    from datetime import datetime
     from modules.storage import load_merged_contacts, save_merged_contacts
 
     existing = load_merged_contacts()
     existing_emails = {c["email"].strip().lower() for c in existing if c.get("email")}
 
     baru = 0
+    now = datetime.now().isoformat(timespec="seconds")
     for name, email, phone, job_title, company in _read_rows(filepath):
         if not name or name in ("", "FULL NAME", "0.0"):
             continue
@@ -145,6 +147,7 @@ def merge_xls_into_all(filepath):
                 "email": email,
                 "company": company,
                 "job_title": job_title,
+                "added_at": now,
             })
             existing_emails.add(email_lower)
             baru += 1

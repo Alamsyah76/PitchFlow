@@ -1,7 +1,9 @@
-"""Open tracking endpoint — serves 1x1 pixel and logs opens"""
+"""Open + Click tracking endpoints — pixel for opens, redirect for clicks"""
+from urllib.parse import unquote
 from fastapi import APIRouter, Request
-from fastapi.responses import Response
+from fastapi.responses import Response, RedirectResponse
 from modules.open_tracking import log_open, get_open_stats, reset_tracking, PIXEL_GIF
+from modules.click_tracking import log_click, get_click_stats, reset_clicks
 from . import get_active_template
 
 router = APIRouter(prefix="", tags=["Tracking"])
@@ -43,3 +45,31 @@ async def tracking_reset():
     """Reset all tracking data"""
     reset_tracking()
     return {"success": True, "message": "Tracking data reset"}
+
+
+@router.get("/track/click")
+async def track_click(url: str = "", email: str = "", template_id: str = "", request: Request = None):
+    """Click tracking — log click event then redirect to the real URL"""
+    target = unquote(url)
+    if target and email:
+        ip = request.client.host if request else ""
+        ua = request.headers.get("user-agent", "") if request else ""
+        log_click(email, target, template_id, "", ip, ua)
+
+    # Redirect to the real URL, or fallback
+    if target and target.startswith(("http://", "https://")):
+        return RedirectResponse(target)
+    return RedirectResponse("/")
+
+
+@router.get("/track/click/stats")
+async def click_stats(email: str = ""):
+    """Get click tracking statistics"""
+    return {"success": True, "data": get_click_stats(email)}
+
+
+@router.post("/track/click/reset")
+async def click_reset():
+    """Reset all click tracking data"""
+    reset_clicks()
+    return {"success": True, "message": "Click tracking data reset"}

@@ -25,6 +25,7 @@ interface Summary {
   total_opens: number; unique_opens: number; open_rate: number
   total_contacts: number; pending: number; blog_posts_sent: number
   total_bounced?: number; bounce_rate?: number
+  total_clicks?: number; unique_clicks?: number; ctr?: number
   last_checked: string
 }
 
@@ -38,12 +39,14 @@ interface Campaign {
 }
 
 interface TimelineDay { date: string; sent: number; failed: number; opens: number; unique_opens: number }
+interface GrowthDay { date: string; new: number; total: number }
 interface Activity { timestamp: string; email: string; name: string; status: string; error: string }
 
 export default function DashboardRoute() {
   const [summary, setSummary] = useState<Summary | null>(null)
   const [contentStats, setContentStats] = useState<ContentStats | null>(null)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [growth, setGrowth] = useState<GrowthDay[]>([])
   const [timeline, setTimeline] = useState<TimelineDay[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,21 +59,23 @@ export default function DashboardRoute() {
   async function fetchAll() {
     setLoading(true)
     try {
-      const [sumRes, timeRes, actRes, contentRes, campRes] = await Promise.all([
+      const [sumRes, timeRes, actRes, contentRes, campRes, growRes] = await Promise.all([
         fetch(`${API}/api/email-campaign/report/summary`),
         fetch(`${API}/api/email-campaign/report/timeline?days=${range}`),
         fetch(`${API}/api/email-campaign/report/recent-activity?limit=8`),
         fetch(`${API}/api/v1/content/stats`),
         fetch(`${API}/api/email-campaign/report/campaigns?limit=10`),
+        fetch(`${API}/api/email-campaign/report/audience-growth?days=${range}`),
       ])
-      const [sumData, timeData, actData, contentData, campData] = await Promise.all([
-        sumRes.json(), timeRes.json(), actRes.json(), contentRes.json(), campRes.json(),
+      const [sumData, timeData, actData, contentData, campData, growData] = await Promise.all([
+        sumRes.json(), timeRes.json(), actRes.json(), contentRes.json(), campRes.json(), growRes.json(),
       ])
       if (sumData.success) setSummary(sumData.data)
       if (timeData.success) setTimeline(timeData.data.timeline)
       if (actData.success) setActivities(actData.data)
       if (contentData.success) setContentStats(contentData.data)
       if (campData.success) setCampaigns(campData.data.campaigns || [])
+      if (growData.success) setGrowth(growData.data.growth || [])
     } catch (e) {
       console.error('Dashboard fetch error:', e)
     } finally {
@@ -169,6 +174,13 @@ export default function DashboardRoute() {
               subtitle={`${summary?.unique_opens || 0} unique opens`}
               color={COLORS.primary}
               icon={<OpenIcon />}
+            />
+            <KpiCard
+              title="Click Rate (CTR)"
+              value={`${summary?.ctr || 0}%`}
+              subtitle={`${summary?.unique_clicks || 0} unique clicks`}
+              color={COLORS.warning}
+              icon={<ClickIcon />}
             />
             <KpiCard
               title="Bounce Rate"
@@ -273,6 +285,29 @@ export default function DashboardRoute() {
               <Bar dataKey="sent" stackId="a" fill={COLORS.success} name="Sent" radius={[2, 2, 0, 0]} />
               <Bar dataKey="failed" stackId="a" fill={COLORS.danger} name="Failed" radius={[2, 2, 0, 0]} />
             </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* ── Audience Growth ── */}
+        <ChartCard title="📈 Audience Growth" subtitle="Total contacts over time">
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={growth}>
+              <defs>
+                <linearGradient id="growGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0056b3" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#0056b3" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} stroke="#94A3B8" />
+              <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8" allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0' }}
+                labelFormatter={d => `Date: ${d}`}
+              />
+              <Area type="monotone" dataKey="total" stroke="#0056b3" fill="url(#growGrad)" strokeWidth={2} name="Total contacts" />
+              <Line type="monotone" dataKey="new" stroke="#22C55E" strokeWidth={2} dot={false} name="New (daily)" strokeDasharray="4 4" />
+            </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
 
@@ -400,6 +435,9 @@ function OpenIcon() {
 }
 function BounceIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h2m4 0h4M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+}
+function ClickIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
 }
 function ContactIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
