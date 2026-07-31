@@ -54,7 +54,7 @@ export default function AddContactModal({ open, onClose, onAdd, error }: Props) 
               <label className="mb-1.5 block text-xs font-medium text-slate-600">Email <span className="text-red-400">*</span></label>
               <input name="email" type="email" required
                 className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-400 focus:bg-white focus:outline-none"
-                placeholder="email@perusahaan.com" />
+                placeholder="email@company.com" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

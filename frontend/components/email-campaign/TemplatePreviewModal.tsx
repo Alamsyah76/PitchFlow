@@ -75,10 +75,10 @@ export default function TemplatePreviewModal({ open, tpl, onClose, onEdit, API }
         {/* Footer info */}
         <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-400">
           <span>
-            Preview menggunakan kontak pertama di Audience sebagai sampel.
+            Preview uses the first contact in the Audience as a sample.
             <span className="ml-1 text-slate-300">Placeholder: {`{name}`}, {`{company}`}, {`{email}`}</span>
           </span>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700 font-medium">Tutup</button>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-700 font-medium">Close</button>
         </div>
       </div>
     </div>
