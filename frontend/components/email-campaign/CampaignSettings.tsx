@@ -94,10 +94,10 @@ export default function CampaignSettings({ onBack }: { onBack?: () => void }) {
         </div>
 
         <Field label="Sender Name" value={settings.sender_name} onChange={v => setSettings(s => ({ ...s, sender_name: v }))}
-          placeholder="e.g. Alamsyah" hint="Display name recipients will see" />
+          placeholder="e.g. Marketing Team" hint="Display name recipients will see" />
 
         <Field label="Sender Email" value={settings.sender_email} onChange={v => setSettings(s => ({ ...s, sender_email: v }))}
-          placeholder="e.g. alamsyah@example.com" hint="Must match SMTP credentials" />
+          placeholder="e.g. marketing@company.com" hint="Must match SMTP credentials" />
 
         <div className="border-b border-slate-100 pb-1 pt-2">
           <h3 className="text-sm font-semibold text-slate-800">SMTP Server</h3>
@@ -113,7 +113,7 @@ export default function CampaignSettings({ onBack }: { onBack?: () => void }) {
         </div>
 
         <Field label="SMTP Username" value={settings.smtp_username} onChange={v => setSettings(s => ({ ...s, smtp_username: v }))}
-          placeholder="alamsyah@example.com" />
+          placeholder="marketing@company.com" />
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">SMTP Password</label>
