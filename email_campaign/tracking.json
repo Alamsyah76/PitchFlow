@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "email": "test@pitchflow.com",
+    "template_id": "t1",
+    "template_title": "",
+    "opened_at": "2026-07-31T12:49:25.573070",
+    "ip": "127.0.0.1",
+    "user_agent": "curl/8.19.0"
+  }
+]

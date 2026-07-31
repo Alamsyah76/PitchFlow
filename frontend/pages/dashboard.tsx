@@ -24,12 +24,17 @@ interface Summary {
   total_sent: number; total_failed: number; today_sent: number; today_failed: number
   total_opens: number; unique_opens: number; open_rate: number
   total_contacts: number; pending: number; blog_posts_sent: number
-  total_bounced?: number
+  total_bounced?: number; bounce_rate?: number
   last_checked: string
 }
 
 interface ContentStats {
   total_documents: number; total_chunks: number; total_saved_contents: number
+}
+
+interface Campaign {
+  template_id: string; name: string; sent: number; failed: number; bounced: number
+  open_rate: number; first_sent: string; last_sent: string
 }
 
 interface TimelineDay { date: string; sent: number; failed: number; opens: number; unique_opens: number }
@@ -38,6 +43,7 @@ interface Activity { timestamp: string; email: string; name: string; status: str
 export default function DashboardRoute() {
   const [summary, setSummary] = useState<Summary | null>(null)
   const [contentStats, setContentStats] = useState<ContentStats | null>(null)
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [timeline, setTimeline] = useState<TimelineDay[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,19 +56,21 @@ export default function DashboardRoute() {
   async function fetchAll() {
     setLoading(true)
     try {
-      const [sumRes, timeRes, actRes, contentRes] = await Promise.all([
+      const [sumRes, timeRes, actRes, contentRes, campRes] = await Promise.all([
         fetch(`${API}/api/email-campaign/report/summary`),
         fetch(`${API}/api/email-campaign/report/timeline?days=${range}`),
         fetch(`${API}/api/email-campaign/report/recent-activity?limit=8`),
         fetch(`${API}/api/v1/content/stats`),
+        fetch(`${API}/api/email-campaign/report/campaigns?limit=10`),
       ])
-      const [sumData, timeData, actData, contentData] = await Promise.all([
-        sumRes.json(), timeRes.json(), actRes.json(), contentRes.json(),
+      const [sumData, timeData, actData, contentData, campData] = await Promise.all([
+        sumRes.json(), timeRes.json(), actRes.json(), contentRes.json(), campRes.json(),
       ])
       if (sumData.success) setSummary(sumData.data)
       if (timeData.success) setTimeline(timeData.data.timeline)
       if (actData.success) setActivities(actData.data)
       if (contentData.success) setContentStats(contentData.data)
+      if (campData.success) setCampaigns(campData.data.campaigns || [])
     } catch (e) {
       console.error('Dashboard fetch error:', e)
     } finally {
@@ -163,18 +171,18 @@ export default function DashboardRoute() {
               icon={<OpenIcon />}
             />
             <KpiCard
+              title="Bounce Rate"
+              value={`${summary?.bounce_rate || 0}%`}
+              subtitle={`${summary?.total_bounced || 0} bounced`}
+              color={COLORS.danger}
+              icon={<BounceIcon />}
+            />
+            <KpiCard
               title="Total Contacts"
               value={fmt(summary?.total_contacts || 0)}
               subtitle={`${summary?.pending || 0} pending`}
               color={COLORS.dark}
               icon={<ContactIcon />}
-            />
-            <KpiCard
-              title="Blog Posts"
-              value={fmt(summary?.blog_posts_sent || 0)}
-              subtitle={`Last checked: ${summary?.last_checked?.split('T')[0] || 'never'}`}
-              color={COLORS.warning}
-              icon={<BlogIcon />}
             />
           </div>
         </div>
@@ -268,6 +276,46 @@ export default function DashboardRoute() {
           </ResponsiveContainer>
         </ChartCard>
 
+        {/* ── Campaigns Table (Mailchimp-style) ── */}
+        <ChartCard title="🚀 Campaigns" subtitle="Per template performance">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-xs uppercase text-slate-500">
+                  <th className="pb-2 pr-4 font-medium">Campaign</th>
+                  <th className="pb-2 pr-4 font-medium">Sent</th>
+                  <th className="pb-2 pr-4 font-medium">Opens</th>
+                  <th className="pb-2 pr-4 font-medium">Open Rate</th>
+                  <th className="pb-2 pr-4 font-medium">Bounced</th>
+                  <th className="pb-2 font-medium">Last Sent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaigns.length === 0 ? (
+                  <tr><td colSpan={6} className="py-8 text-center text-sm text-slate-400">No campaigns yet — send your first email campaign</td></tr>
+                ) : campaigns.map((c, i) => (
+                  <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="py-2.5 pr-4 font-medium text-slate-700 max-w-[220px] truncate">{c.name}</td>
+                    <td className="py-2.5 pr-4 text-slate-600">{fmt(c.sent)}</td>
+                    <td className="py-2.5 pr-4 text-slate-600">{c.sent > 0 ? Math.round(c.open_rate / 100 * c.sent) : 0}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">{c.open_rate}%</span>
+                    </td>
+                    <td className="py-2.5 pr-4">
+                      {c.bounced > 0 ? (
+                        <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">{c.bounced}</span>
+                      ) : (
+                        <span className="text-slate-400">0</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 text-xs text-slate-500 whitespace-nowrap">{c.last_sent?.slice(0, 16) || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </ChartCard>
+
         {/* ── Recent Activity ── */}
         <ChartCard title="📋 Recent Activity" subtitle="Last 8 sends">
           <div className="overflow-x-auto">
@@ -349,6 +397,9 @@ function SentIcon() {
 }
 function OpenIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+}
+function BounceIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h2m4 0h4M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
 }
 function ContactIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>

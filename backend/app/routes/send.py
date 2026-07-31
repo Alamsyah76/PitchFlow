@@ -54,6 +54,14 @@ def _build_smtp_config() -> dict:
     sender_name = settings.get("sender_name") or sender.get("name", "")
     sender_email = settings.get("sender_email") or sender.get("email", "")
     
+    # Tracking base URL — pakai env var supaya bekerja di production
+    # (bukan hardcoded localhost). Default ke localhost untuk dev.
+    tracking_base = (
+        os.environ.get("TRACKING_BASE_URL")
+        or os.environ.get("PUBLIC_API_URL")
+        or f"http://localhost:{os.environ.get('API_PORT', '8030')}"
+    ).rstrip("/")
+
     return {
         "host": host,
         "port": port,
@@ -61,7 +69,7 @@ def _build_smtp_config() -> dict:
         "password": password,
         "sender_name": sender_name,
         "sender_email": sender_email,
-        "tracking_base_url": f"http://localhost:{os.environ.get('API_PORT', '8040')}",
+        "tracking_base_url": tracking_base,
     }
 
 

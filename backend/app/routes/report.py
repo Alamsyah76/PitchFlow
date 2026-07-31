@@ -61,6 +61,9 @@ async def report_summary():
         unique_opens = open_stats.get("unique_opens", 0)
         open_rate = round((unique_opens / total_sent * 100), 1) if total_sent > 0 else 0
 
+        # Bounce rate — bounced / (sent + bounced) * 100
+        bounce_rate = round((total_bounced / (total_sent + total_bounced) * 100), 1) if (total_sent + total_bounced) > 0 else 0
+
         # Blog monitor
         blog = get_status()
 
@@ -84,6 +87,7 @@ async def report_summary():
                 "total_opens": total_opens,
                 "unique_opens": unique_opens,
                 "open_rate": open_rate,
+                "bounce_rate": bounce_rate,
                 "total_contacts": total_contacts,
                 "pending": pending,
                 "blog_posts_sent": blog.get("total_sent", 0),
@@ -149,6 +153,76 @@ async def report_timeline(days: int = 30):
         }
     except Exception as e:
         logger.error(f"Report timeline error: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/report/campaigns")
+async def report_campaigns(limit: int = 10):
+    """Campaign list derived from log — group by template_id (Mailchimp-style)."""
+    try:
+        entries = _parse_log_csv()
+        opens_data = []
+        try:
+            track_file = __import__("modules.open_tracking", fromlist=[""]).TRACKING_FILE
+            if track_file.exists():
+                opens_data = json.loads(track_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+        # Template title lookup
+        tpl_titles = {}
+        try:
+            tpl_file = Path(__file__).resolve().parent.parent.parent.parent / "email_campaign" / "templates.json"
+            if tpl_file.exists():
+                tpl_data = json.loads(tpl_file.read_text(encoding="utf-8"))
+                for t in tpl_data.get("templates", []):
+                    tpl_titles[t["id"]] = t.get("title", t["id"])
+        except Exception:
+            pass
+
+        from collections import defaultdict
+        groups = defaultdict(lambda: {"sent": 0, "failed": 0, "bounced": 0, "first": None, "last": None})
+        for e in entries:
+            tid = e["template_id"] or "default"
+            g = groups[tid]
+            if e["status"] == "sent":
+                g["sent"] += 1
+            elif e["status"] == "failed":
+                g["failed"] += 1
+            elif e["status"] == "bounced":
+                g["bounced"] += 1
+            ts = e["timestamp"]
+            if not g["first"] or ts < g["first"]:
+                g["first"] = ts
+            if not g["last"] or ts > g["last"]:
+                g["last"] = ts
+
+        # Opens per template
+        opens_by_tpl = defaultdict(lambda: {"total": 0, "unique": set()})
+        for o in opens_data:
+            tid = o.get("template_id", "")
+            opens_by_tpl[tid]["total"] += 1
+            opens_by_tpl[tid]["unique"].add(o.get("email", ""))
+
+        campaigns = []
+        for tid, g in groups.items():
+            delivered = g["sent"] + g["failed"] + g["bounced"]
+            open_info = opens_by_tpl.get(tid, {"total": 0, "unique": set()})
+            campaigns.append({
+                "template_id": tid,
+                "name": tpl_titles.get(tid, tid),
+                "sent": g["sent"],
+                "failed": g["failed"],
+                "bounced": g["bounced"],
+                "open_rate": round((len(open_info["unique"]) / g["sent"] * 100), 1) if g["sent"] > 0 else 0,
+                "first_sent": g["first"],
+                "last_sent": g["last"],
+            })
+
+        campaigns.sort(key=lambda c: c["last_sent"] or "", reverse=True)
+        return {"success": True, "data": {"campaigns": campaigns[:limit]}}
+    except Exception as e:
+        logger.error(f"Report campaigns error: {e}")
         return {"success": False, "error": str(e)}
 
 
