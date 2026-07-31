@@ -166,45 +166,45 @@ export default function LandingPage() {
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/80">
                   <th className="px-5 py-4 font-semibold text-slate-700">Feature</th>
-                  <th className="px-5 py-4 font-semibold text-blue-600">PitchFlow</th>
                   <th className="px-5 py-4 font-semibold text-slate-400">Generic AI Tools</th>
+                  <th className="px-5 py-4 font-semibold text-white bg-gradient-to-r from-[#0056b3] to-[#003d7a]">PitchFlow</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-slate-100">
-                  <td className="px-5 py-4 font-medium text-slate-700">Workflow</td>
-                  <td className="px-5 py-4 text-slate-600">Upload PDF → content ready automatically</td>
-                  <td className="px-5 py-4 text-slate-400">Write prompts, trial-and-error, refine</td>
+                  <td className="px-5 py-4 font-medium text-slate-700">Source of truth</td>
+                  <td className="px-5 py-4 text-slate-400">The model's training memory — may be outdated or wrong</td>
+                  <td className="px-5 py-4 text-slate-600">Your document (RAG) — every fact pulled from your own PDF</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/30">
-                  <td className="px-5 py-4 font-medium text-slate-700">Accuracy</td>
-                  <td className="px-5 py-4 text-slate-600">RAG grounded — every claim verified against the source document</td>
-                  <td className="px-5 py-4 text-slate-400">High hallucination, often fabricates facts</td>
+                  <td className="px-5 py-4 font-medium text-slate-700">Hallucination</td>
+                  <td className="px-5 py-4 text-slate-400">High — often fabricates numbers and claims</td>
+                  <td className="px-5 py-4 text-slate-600">Zero — every claim verified against the source document</td>
                 </tr>
                 <tr className="border-b border-slate-100">
+                  <td className="px-5 py-4 font-medium text-slate-700">Output</td>
+                  <td className="px-5 py-4 text-slate-400">Text only — images, emails, and posts built separately</td>
+                  <td className="px-5 py-4 text-slate-600">3-in-1: LinkedIn caption + email + image from one document</td>
+                </tr>
+                <tr className="border-b border-slate-100 bg-slate-50/30">
                   <td className="px-5 py-4 font-medium text-slate-700">AI-ish Output</td>
-                  <td className="px-5 py-4 text-slate-600">80+ AI phrases blocked + naturalization filter</td>
                   <td className="px-5 py-4 text-slate-400">Easily recognizable as AI-generated</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/30">
-                  <td className="px-5 py-4 font-medium text-slate-700">Persona</td>
-                  <td className="px-5 py-4 text-slate-600">Dynamic — adapts automatically to the document's industry</td>
-                  <td className="px-5 py-4 text-slate-400">Manual prompt changes per industry</td>
+                  <td className="px-5 py-4 text-slate-600">80+ AI phrases blocked + naturalization filter</td>
                 </tr>
                 <tr className="border-b border-slate-100">
-                  <td className="px-5 py-4 font-medium text-slate-700">Output format</td>
-                  <td className="px-5 py-4 text-slate-600">LinkedIn caption + email + image + ZIP</td>
-                  <td className="px-5 py-4 text-slate-400">Text only, images and emails separate</td>
+                  <td className="px-5 py-4 font-medium text-slate-700">Persona</td>
+                  <td className="px-5 py-4 text-slate-400">Manual prompt changes per industry</td>
+                  <td className="px-5 py-4 text-slate-600">Dynamic — adapts automatically to the document's industry</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/30">
-                  <td className="px-5 py-4 font-medium text-slate-700">Export</td>
-                  <td className="px-5 py-4 text-slate-600">ZIP — topics, content, images, no metadata</td>
-                  <td className="px-5 py-4 text-slate-400">Manual copy-paste or proprietary formats</td>
+                  <td className="px-5 py-4 font-medium text-slate-700">Workflow</td>
+                  <td className="px-5 py-4 text-slate-400">Write prompts, trial-and-error, refine</td>
+                  <td className="px-5 py-4 text-slate-600">Upload PDF → content ready automatically</td>
                 </tr>
                 <tr>
-                  <td className="px-5 py-4 font-medium text-slate-700">Local Language</td>
-                  <td className="px-5 py-4 text-slate-600">Native, with AVOID list for natural phrasing</td>
-                  <td className="px-5 py-4 text-slate-400">English first, local language as an afterthought</td>
+                  <td className="px-5 py-4 font-medium text-slate-700">Ownership</td>
+                  <td className="px-5 py-4 text-slate-400">Locked into the platform's format</td>
+                  <td className="px-5 py-4 text-slate-600">Clean ZIP export — your files belong to you, no metadata</td>
                 </tr>
               </tbody>
             </table>
