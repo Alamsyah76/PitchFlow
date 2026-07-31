@@ -27,11 +27,16 @@ interface Summary {
   last_checked: string
 }
 
+interface ContentStats {
+  total_documents: number; total_chunks: number; total_saved_contents: number
+}
+
 interface TimelineDay { date: string; sent: number; failed: number; opens: number; unique_opens: number }
 interface Activity { timestamp: string; email: string; name: string; status: string; error: string }
 
 export default function DashboardRoute() {
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [contentStats, setContentStats] = useState<ContentStats | null>(null)
   const [timeline, setTimeline] = useState<TimelineDay[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
@@ -44,17 +49,19 @@ export default function DashboardRoute() {
   async function fetchAll() {
     setLoading(true)
     try {
-      const [sumRes, timeRes, actRes] = await Promise.all([
+      const [sumRes, timeRes, actRes, contentRes] = await Promise.all([
         fetch(`${API}/api/email-campaign/report/summary`),
         fetch(`${API}/api/email-campaign/report/timeline?days=${range}`),
         fetch(`${API}/api/email-campaign/report/recent-activity?limit=8`),
+        fetch(`${API}/api/v1/content/stats`),
       ])
-      const [sumData, timeData, actData] = await Promise.all([
-        sumRes.json(), timeRes.json(), actRes.json(),
+      const [sumData, timeData, actData, contentData] = await Promise.all([
+        sumRes.json(), timeRes.json(), actRes.json(), contentRes.json(),
       ])
       if (sumData.success) setSummary(sumData.data)
       if (timeData.success) setTimeline(timeData.data.timeline)
       if (actData.success) setActivities(actData.data)
+      if (contentData.success) setContentStats(contentData.data)
     } catch (e) {
       console.error('Dashboard fetch error:', e)
     } finally {
@@ -132,6 +139,34 @@ export default function DashboardRoute() {
             color={COLORS.warning}
             icon={<BlogIcon />}
           />
+        </div>
+
+        {/* ── Content Studio Panel ── */}
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">🎨 Content Studio</h3>
+              <p className="text-xs text-slate-400">Documents processed &amp; content generated</p>
+            </div>
+            <a href="/content-studio" className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">Open Studio →</a>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Documents Uploaded</p>
+              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_documents || 0)}</p>
+              <p className="mt-1 text-xs text-slate-400">PDF processed</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Knowledge Chunks</p>
+              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_chunks || 0)}</p>
+              <p className="mt-1 text-xs text-slate-400">RAG embeddings</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Contents Saved</p>
+              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_saved_contents || 0)}</p>
+              <p className="mt-1 text-xs text-slate-400">Captions generated</p>
+            </div>
+          </div>
         </div>
 
         {/* ── Two-column charts ── */}

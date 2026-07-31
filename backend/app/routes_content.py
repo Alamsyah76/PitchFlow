@@ -23,6 +23,32 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
+@router.get("/stats")
+async def content_stats(_: CurrentUser = Depends(get_current_user_or_dev)):
+    """Content Studio analytics — documents, chunks, saved contents."""
+    try:
+        from sqlalchemy import text
+        from models.database import DatabaseConnection
+        db = DatabaseConnection.get_session()
+        try:
+            docs = db.execute(text("SELECT COUNT(*) FROM documents")).scalar() or 0
+            chunks = db.execute(text("SELECT COUNT(*) FROM vector_store")).scalar() or 0
+            saved = db.execute(text("SELECT COUNT(*) FROM contents")).scalar() or 0
+        finally:
+            db.close()
+        return {
+            "success": True,
+            "data": {
+                "total_documents": docs,
+                "total_chunks": chunks,
+                "total_saved_contents": saved,
+            },
+        }
+    except Exception as e:
+        logger.error(f"Content stats error: {e}")
+        return {"success": True, "data": {"total_documents": 0, "total_chunks": 0, "total_saved_contents": 0}}
+
+
 def _extract_pdf_text(filepath: Path) -> str:
     """Extract text from PDF — fallback OCR jika text-based gagal"""
     # Try pypdf first

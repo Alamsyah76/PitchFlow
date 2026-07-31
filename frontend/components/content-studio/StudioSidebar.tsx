@@ -3,9 +3,9 @@ import { Banknote, Bookmark, Home, LayoutDashboard, Mail, Settings, Sparkles } f
 
 const menuItems = [
   { label: 'Beranda', icon: Home, route: '/' },
+  { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard' },
   { label: 'Content Studio', icon: Sparkles, route: '/content-studio' },
   { label: 'Email Campaign', icon: Mail, route: '/email-campaign' },
-  { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard' },
   { label: 'Library', icon: Bookmark, route: '/library' },
   { label: 'Pricing', icon: Banknote, route: '/pricing' },
   { label: 'Settings', icon: Settings, route: '/settings' },
