@@ -108,46 +108,56 @@ export default function DashboardRoute() {
   return (
     <AppShell activeRoute="/dashboard">
       <div className="mx-auto max-w-7xl space-y-6 p-6">
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-            <p className="mt-1 text-sm text-slate-500">Overview of Content Studio &amp; Email Campaign performance</p>
+        {/* ── Header Hero ── */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0056b3] via-[#0a66c9] to-[#4C3FD8] p-6 text-white shadow-[0_8px_30px_rgba(0,86,179,0.25)]">
+          <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute right-24 -bottom-10 h-32 w-32 rounded-full bg-white/10 blur-xl" />
+          <div className="relative flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+              <p className="mt-1 text-sm text-white/75">Overview of Content Studio &amp; Email Campaign performance</p>
+            </div>
+            <button
+              onClick={fetchAll}
+              className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur transition hover:bg-white/25"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Refresh
+            </button>
           </div>
-          <button
-            onClick={fetchAll}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            Refresh
-          </button>
         </div>
 
         {/* ── Content Studio Panel (top) ── */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">🎨 Content Studio</h3>
+              <h3 className="text-lg font-semibold text-slate-900">🎨 Content Studio</h3>
               <p className="text-xs text-slate-400">Documents processed &amp; content generated</p>
             </div>
             <a href="/content-studio" className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">Open Studio →</a>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Documents Uploaded</p>
-              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_documents || 0)}</p>
-              <p className="mt-1 text-xs text-slate-400">PDF processed</p>
-            </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Knowledge Chunks</p>
-              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_chunks || 0)}</p>
-              <p className="mt-1 text-xs text-slate-400">RAG embeddings</p>
-            </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Contents Saved</p>
-              <p className="mt-1.5 text-2xl font-bold text-slate-900">{fmt(contentStats?.total_saved_contents || 0)}</p>
-              <p className="mt-1 text-xs text-slate-400">Captions generated</p>
-            </div>
+            <KpiCardPremium
+              title="Documents Uploaded"
+              value={fmt(contentStats?.total_documents || 0)}
+              subtitle="PDF processed"
+              icon={<DocIcon />}
+              accent="from-sky-500 to-blue-600"
+            />
+            <KpiCardPremium
+              title="Knowledge Chunks"
+              value={fmt(contentStats?.total_chunks || 0)}
+              subtitle="RAG embeddings"
+              icon={<ChunkIcon />}
+              accent="from-indigo-500 to-violet-600"
+            />
+            <KpiCardPremium
+              title="Contents Saved"
+              value={fmt(contentStats?.total_saved_contents || 0)}
+              subtitle="Captions generated"
+              icon={<SaveIcon />}
+              accent="from-emerald-500 to-teal-600"
+            />
           </div>
         </div>
 
@@ -197,28 +207,32 @@ export default function DashboardRoute() {
 
           {/* Audience summary strip */}
           <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="absolute left-0 top-0 h-full w-1 bg-slate-400" />
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Total Contacts</p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-slate-900">{fmt(summary?.total_contacts || 0)}</span>
                 <span className="text-xs text-slate-400">all</span>
               </div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="absolute left-0 top-0 h-full w-1 bg-amber-400" />
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Pending</p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-amber-600">{fmt(summary?.pending || 0)}</span>
                 <span className="text-xs text-slate-400">to send</span>
               </div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="absolute left-0 top-0 h-full w-1 bg-emerald-400" />
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Delivered</p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-emerald-600">{fmt((summary?.total_sent || 0) - (summary?.total_bounced || 0))}</span>
                 <span className="text-xs text-slate-400">ok</span>
               </div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="absolute left-0 top-0 h-full w-1 bg-rose-400" />
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Failed + Bounced</p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-rose-600">{fmt((summary?.total_failed || 0) + (summary?.total_bounced || 0))}</span>
@@ -454,12 +468,17 @@ function ChartCard({ title, subtitle, children, className = '' }: {
   title: string; subtitle?: string; children: React.ReactNode; className?: string
 }) {
   return (
-    <div className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>
-      <div className="mb-3">
-        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+    <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
+      <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-3.5">
+        <span className="h-8 w-1 rounded-full bg-gradient-to-b from-[#0056b3] to-[#4C3FD8]" />
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+          {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        </div>
       </div>
-      {children}
+      <div className="p-5">
+        {children}
+      </div>
     </div>
   )
 }
@@ -477,9 +496,12 @@ function BounceIcon() {
 function ClickIcon() {
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
 }
-function ContactIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+function DocIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
 }
-function BlogIcon() {
-  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+function ChunkIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7V4h3m10 0h3v3M4 17v3h3m10 0h3v-3" /></svg>
+}
+function SaveIcon() {
+  return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
 }
