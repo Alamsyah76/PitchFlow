@@ -176,7 +176,7 @@ export default function SenderSettings() {
           <label className="mb-1 block text-xs font-medium text-slate-500">Sender Name</label>
           <input value={name} onChange={e => setName(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
-            placeholder="e.g. John Doe" />
+            placeholder="e.g. Marketing Manager" />
         </div>
 
         {/* Email */}
