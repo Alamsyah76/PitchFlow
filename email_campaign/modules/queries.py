@@ -93,20 +93,32 @@ def get_campaign_stats():
     all_contacts_raw = get_all_contacts_raw()
     all_contacts_valid = get_all_contacts()
     sent_emails = load_log()
+    from modules.log_store import load_bounced
+    bounced_emails = load_bounced()
 
     total = len(all_contacts_raw)
     valid = len(all_contacts_valid)
+    # attempted = sudah dikirim ATAU bounce (bounce adalah subset dari yang dikirim)
+    attempted = sent_emails | bounced_emails
     sent = len(sent_emails)
-    # Pending count: valid contacts minus sent, plus test emails (always selectable)
+    bounced = len(bounced_emails)
+
+    # Pending — hitung dari kontak yang VALID & ada di list & belum di-attempt
+    # (sama persis dengan logika preview, jadi angka selalu sinkron)
     test_email_lower = {e.strip().lower() for e in TEST_EMAILS}
-    test_in_sent = sent_emails & test_email_lower
-    pending = max(0, valid - sent + len(test_in_sent))
+    pending = 0
+    for c in all_contacts_valid:
+        e = c.get("email", "").strip().lower()
+        if e not in attempted or e in test_email_lower:
+            pending += 1
+    test_in_attempted = attempted & test_email_lower
 
     return {
         "total_contacts": total,
         "valid_emails": valid,
         "already_sent": sent,
+        "bounced": bounced,
         "pending": pending,
-        "test_emails_available": len(test_in_sent),
+        "test_emails_available": len(test_in_attempted),
         "daily_limit": settings.get("daily_limit", int(os.environ.get("DAILY_LIMIT", 10))),
     }

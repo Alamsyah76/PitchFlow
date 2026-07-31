@@ -77,14 +77,13 @@ async def report_summary():
         # Blog monitor
         blog = get_status()
 
-        # Contacts
-        from modules.storage import load_merged_contacts
-        contacts = load_merged_contacts()
-        total_contacts = len(contacts)
+        # Contacts — gunakan valid emails supaya konsisten dengan status endpoint
+        from modules.queries import get_campaign_stats as _stats
+        campaign = _stats()
+        total_contacts = campaign.get("valid_emails", 0)
 
-        # Pending = belum dikirim & tidak gagal/bounce
-        delivered = total_sent + total_failed + total_bounced
-        pending = max(0, total_contacts - delivered)
+        # Pending — sama persis dengan status endpoint
+        pending = campaign.get("pending", 0)
 
         return {
             "success": True,
