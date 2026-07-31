@@ -110,40 +110,40 @@ export default function SenderSettings() {
     } catch {}
   }
 
-  if (loading) return <div className="rounded-xl border border-slate-200/70 bg-white p-6 shadow-sm text-sm text-slate-500">Memuat...</div>
+  if (loading) return <div className="rounded-xl border border-slate-200/70 bg-white p-6 shadow-sm text-sm text-slate-500">Loading...</div>
 
   return (
     <div className="rounded-xl border border-slate-200/70 bg-white shadow-sm">
       <div className="border-b border-slate-100 px-5 py-3.5">
-        <h3 className="text-sm font-semibold text-slate-800">⚙️ Pengaturan Pengirim</h3>
+        <h3 className="text-sm font-semibold text-slate-800">⚙️ Sender Settings</h3>
       </div>
       <div className="space-y-5 p-5">
         {/* Logo */}
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Logo Perusahaan</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">Company Logo</label>
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-36 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 overflow-hidden">
               {logoPreview ? (
                 <img src={logoPreview.startsWith('data:') ? logoPreview : `data:image/png;base64,${logoPreview}`} alt="Logo" className="h-full w-full object-contain p-2" />
               ) : (
-                <span className="text-[10px] text-slate-400">Belum ada logo</span>
+                <span className="text-[10px] text-slate-400">No logo yet</span>
               )}
             </div>
             <label className="cursor-pointer rounded-lg border border-blue-200 bg-white px-4 py-2 text-xs font-medium text-blue-600 hover:bg-blue-50">
-              Pilih File
+              Choose File
               <input type="file" accept="image/*" onChange={handleLogo} className="hidden" />
             </label>
             {logoPreview && (
               <button onClick={() => { setLogoPreview(''); setLogoB64('') }}
-                className="text-xs text-red-500 hover:text-red-700">Hapus</button>
+                className="text-xs text-red-500 hover:text-red-700">Remove</button>
             )}
           </div>
-          <p className="mt-1 text-[10px] text-slate-400">Format: PNG/JPG. Ukuran: max 300x100px</p>
+          <p className="mt-1 text-[10px] text-slate-400">Format: PNG/JPG. Size: max 300x100px</p>
         </div>
 
         {/* Profile Photo */}
         <div className="border-t border-slate-100 pt-5">
-          <h4 className="mb-3 text-sm font-semibold text-slate-700">📷 Foto Profile</h4>
+          <h4 className="mb-3 text-sm font-semibold text-slate-700">📷 Profile Photo</h4>
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-slate-300 bg-slate-50 overflow-hidden">
               {avatarPreview ? (
@@ -153,54 +153,54 @@ export default function SenderSettings() {
               )}
             </div>
             <label className="cursor-pointer rounded-lg border border-blue-200 bg-white px-4 py-2 text-xs font-medium text-blue-600 hover:bg-blue-50">
-              Pilih Foto
+              Choose Photo
               <input type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
             </label>
             {avatarPreview && (
               <button onClick={() => { setAvatarPreview(''); setAvatarB64('') }}
-                className="text-xs text-red-500 hover:text-red-700">Hapus</button>
+                className="text-xs text-red-500 hover:text-red-700">Remove</button>
             )}
             {userEmail && (
               <button onClick={saveProfile}
                 className="rounded-lg bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-4 py-2 text-xs font-semibold text-white hover:brightness-110">
-                Simpan Foto
+                Save Photo
               </button>
             )}
-            {profileSaved && <span className="text-xs text-emerald-600">✅ Tersimpan</span>}
+            {profileSaved && <span className="text-xs text-emerald-600">✅ Saved</span>}
           </div>
-          <p className="mt-1 text-[10px] text-slate-400">Foto akan tampil di pojok kanan atas setelah refresh.</p>
+          <p className="mt-1 text-[10px] text-slate-400">Photo will appear in the top-right corner after refresh.</p>
         </div>
 
-        {/* Nama */}
+        {/* Name */}
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Nama Pengirim</label>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Sender Name</label>
           <input value={name} onChange={e => setName(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
-            placeholder="Contoh: Jhon Doe" />
+            placeholder="e.g. John Doe" />
         </div>
 
         {/* Email */}
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Email Pengirim</label>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Sender Email</label>
           <input value={email} onChange={e => setEmail(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
-            placeholder="email@perusahaan.com" />
+            placeholder="email@company.com" />
         </div>
 
-        {/* Perusahaan */}
+        {/* Company */}
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Nama Perusahaan</label>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Company Name</label>
           <input value={company} onChange={e => setCompany(e.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
-            placeholder="Contoh: PitchFlow" />
+            placeholder="e.g. PitchFlow" />
         </div>
 
         {/* Save */}
         <button onClick={handleSave}
           className="rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-6 py-2.5 text-sm font-semibold text-white hover:brightness-110">
-          Simpan Pengaturan
+          Save Settings
         </button>
-        {saved && <span className="ml-3 text-sm text-emerald-600">✅ Tersimpan</span>}
+        {saved && <span className="ml-3 text-sm text-emerald-600">✅ Saved</span>}
       </div>
     </div>
   )

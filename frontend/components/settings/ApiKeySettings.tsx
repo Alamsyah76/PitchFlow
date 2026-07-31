@@ -54,14 +54,14 @@ export default function ApiKeySettings() {
       })
       const d = await r.json()
       if (d.success) {
-        setMessage('API Key berhasil disimpan!')
+        setMessage('API Key saved successfully!')
         setHasKey(true)
         setKeyPreview(apiKey.trim().slice(0, 8) + '...' + apiKey.trim().slice(-4))
         setApiKey('')
       } else {
-        setError(d.detail || d.message || 'Gagal menyimpan')
+        setError(d.detail || d.message || 'Failed to save')
       }
-    } catch { setError('Gagal terhubung ke server') }
+    } catch { setError('Failed to connect to server') }
     setLoading(false)
   }
 
@@ -76,29 +76,29 @@ export default function ApiKeySettings() {
       })
       const d = await r.json()
       if (d.success) {
-        setMessage('API Key dihapus. Akan menggunakan key global.')
+        setMessage('API Key removed. Global key will be used.')
         setHasKey(false)
         setKeyPreview('')
       }
-    } catch { setError('Gagal terhubung ke server') }
+    } catch { setError('Failed to connect to server') }
     setLoading(false)
   }
 
   if (checking) return <div className="flex items-center gap-2 text-sm text-slate-500"><Loader2 className="animate-spin" size={16} />Loading...</div>
-  if (!email) return <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Login dulu untuk mengatur API Key.</div>
+  if (!email) return <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Please log in to manage your API Key.</div>
 
   return (
     <div className="max-w-lg">
       <h2 className="text-lg font-semibold text-slate-900 mb-1">Bring Your Own Key (BYOK)</h2>
       <p className="text-sm text-slate-500 mb-6">
-        Gunakan OpenAI API Key kamu sendiri. Biaya pemakaian akan ditagih ke akun OpenAI kamu.
-        {!hasKey && ' Kosongkan untuk menggunakan key global dari sistem.'}
+        Use your own OpenAI API Key. Usage will be billed to your OpenAI account.
+        {!hasKey && ' Leave empty to use the system global key.'}
       </p>
 
       {hasKey && (
         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
           <div className="flex items-center gap-2 text-emerald-700 font-medium text-sm mb-1">
-            <Key size={16} /> API Key Aktif
+            <Key size={16} /> Active API Key
           </div>
           <p className="text-xs text-emerald-600 font-mono">{keyPreview}</p>
         </div>
@@ -112,7 +112,7 @@ export default function ApiKeySettings() {
               type={showKey ? 'text' : 'password'}
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
-              placeholder={hasKey ? 'Ketik key baru untuk mengganti...' : 'sk-proj-...'}
+              placeholder={hasKey ? 'Type a new key to replace...' : 'sk-proj-...'}
               className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-mono focus:border-[#0056b3] focus:outline-none focus:ring-2 focus:ring-[#0056b3]/20"
             />
             <button
@@ -122,7 +122,7 @@ export default function ApiKeySettings() {
               {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          <p className="mt-1 text-xs text-slate-400">Key dimulai dengan <code className="bg-slate-100 px-1 rounded">sk-</code>. Dapatkan di platform.openai.com/api-keys</p>
+          <p className="mt-1 text-xs text-slate-400">Keys start with <code className="bg-slate-100 px-1 rounded">sk-</code>. Get one at platform.openai.com/api-keys</p>
         </div>
 
         {error && <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>}
@@ -135,7 +135,7 @@ export default function ApiKeySettings() {
             className="rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-50 hover:brightness-110 flex items-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
-            Simpan API Key
+            Save API Key
           </button>
           {hasKey && (
             <button
@@ -143,7 +143,7 @@ export default function ApiKeySettings() {
               disabled={loading}
               className="rounded-xl border border-red-300 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
             >
-              Hapus Key
+              Remove Key
             </button>
           )}
         </div>

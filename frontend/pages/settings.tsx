@@ -18,7 +18,7 @@ export default function SettingsRoute() {
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#FAFBFF_0%,#F7F8FB_42%,#F5F6FA_100%)] text-slate-950">
       <StudioSidebar activeRoute="/settings" />
-      <StudioHeader title="Pengaturan" />
+      <StudioHeader title="Settings" />
       <main className="px-4 py-4 md:px-8 md:py-6 lg:ml-[260px] xl:px-10">
         <div className="mx-auto max-w-screen-2xl pb-28">
 
