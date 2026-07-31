@@ -68,10 +68,10 @@ export default function LandingPage() {
           </Link>
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
+            <Link href="/dashboard">Dashboard</Link>
             <Link href="/content-studio">Content Studio</Link>
             <Link href="/email-campaign">Email Campaign</Link>
-            <Link href="/dashboard">Dashboard</Link>
+            <a href="#pricing">Pricing</a>
             <Link href="/settings">Settings</Link>
             <Link href="/auth" className="rounded-lg bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow">
               Login
@@ -85,10 +85,10 @@ export default function LandingPage() {
           <div className="border-t border-slate-100 bg-white px-5 py-4 md:hidden">
             <div className="flex flex-col gap-3 text-sm font-medium text-slate-600">
               <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
-              <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
+              <Link href="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
               <Link href="/content-studio" onClick={() => setMenuOpen(false)}>Content Studio</Link>
               <Link href="/email-campaign" onClick={() => setMenuOpen(false)}>Email Campaign</Link>
-              <Link href="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
               <Link href="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
               <Link href="/content-studio" className="mt-2 rounded-lg bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-4 py-2 text-center font-semibold text-white" onClick={() => setMenuOpen(false)}>Start Free</Link>
             </div>
