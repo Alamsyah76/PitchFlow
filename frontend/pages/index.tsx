@@ -21,22 +21,22 @@ const STEPS = [
 const PRICING = [
   {
     name: 'Free', price: 'Rp 0', period: '',
-    konten: '3 files/month', image: '1x trial', email: false, chat: '3/day', library: false,
+    files: '3 files/month', image: '1x trial', email: false, chat: '3/day', library: false,
     cta: 'Start Free', highlight: false
   },
   {
     name: 'Basic', price: 'Rp 49k', period: '/month',
-    konten: '20 files/month', image: 'Standard', email: false, chat: '20/day', library: '2/industry',
+    files: '20 files/month', image: 'Standard', email: false, chat: '20/day', library: '2/industry',
     cta: 'Subscribe', highlight: false
   },
   {
     name: 'Business', price: 'Rp 149k', period: '/month',
-    konten: '100 files/month', image: '1024×1024', email: '100 contacts', chat: '100/day', library: '5/industry',
+    files: '100 files/month', image: '1024×1024', email: '100 contacts', chat: '100/day', library: '5/industry',
     cta: 'Subscribe', highlight: true
   },
   {
     name: 'Pro', price: 'Rp 299k', period: '/month',
-    konten: 'Unlimited', image: '1024×1024', email: 'Unlimited', chat: 'Unlimited', library: 'Unlimited',
+    files: 'Unlimited', image: '1024×1024', email: 'Unlimited', chat: 'Unlimited', library: 'Unlimited',
     cta: 'Contact Us', highlight: false
   },
 ]
@@ -246,7 +246,7 @@ export default function LandingPage() {
                 </div>
                 <ul className="mt-5 space-y-2.5 text-sm text-slate-600 flex-1">
                   <li className="flex items-center gap-2">{'\u2705'} Content Studio</li>
-                  <li className="flex items-center gap-2">{'\u2705'} {p.konten}</li>
+                  <li className="flex items-center gap-2">{'\u2705'} {p.files}</li>
                   <li className="flex items-center gap-2">{'\u2705'} Image {p.image}</li>
                   {p.library && <li className="flex items-center gap-2">{'\u2705'} Library {p.library}</li>}
                   <li className="flex items-center gap-2">{p.email ? '\u2705' : '\u274C'} Email {p.email || '—'}</li>

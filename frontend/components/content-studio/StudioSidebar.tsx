@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Banknote, Bookmark, Home, LayoutDashboard, Mail, Settings, Sparkles } from 'lucide-react'
 
 const menuItems = [
-  { label: 'Beranda', icon: Home, route: '/' },
+  { label: 'Home', icon: Home, route: '/' },
   { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard' },
   { label: 'Content Studio', icon: Sparkles, route: '/content-studio' },
   { label: 'Email Campaign', icon: Mail, route: '/email-campaign' },

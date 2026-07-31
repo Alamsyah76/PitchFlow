@@ -36,7 +36,7 @@ export default function AuthPage() {
 
   async function handleRegister() {
     reset()
-    if (!name.trim() || !email.trim()) { setError('Nama dan email wajib diisi.'); return }
+    if (!name.trim() || !email.trim()) { setError('Name and email are required.'); return }
     setLoading(true)
     try {
       const r = await fetch(`${API}/api/auth/register`, {
@@ -44,15 +44,15 @@ export default function AuthPage() {
         body: JSON.stringify({ name: name.trim(), email: email.trim() })
       })
       const d = await r.json()
-      if (d.success) { setMessage('Kode OTP sudah dikirim ke email kamu.'); setStep('otp') }
-      else setError(d.detail || d.message || 'Gagal daftar.')
-    } catch { setError('Gagal terhubung ke server.') }
+      if (d.success) { setMessage('OTP code has been sent to your email.'); setStep('otp') }
+      else setError(d.detail || d.message || 'Registration failed.')
+    } catch { setError('Failed to connect to the server.') }
     setLoading(false)
   }
 
   async function handleRequestOtp() {
     reset()
-    if (!email.trim()) { setError('Email wajib diisi.'); return }
+    if (!email.trim()) { setError('Email is required.'); return }
     setLoading(true)
     try {
       const r = await fetch(`${API}/api/auth/request-otp`, {
@@ -60,15 +60,15 @@ export default function AuthPage() {
         body: JSON.stringify({ email: email.trim() })
       })
       const d = await r.json()
-      if (d.success) { setMessage('Kode OTP sudah dikirim ke email kamu.'); setStep('otp') }
-      else setError(d.detail || d.message || 'Email tidak terdaftar.')
-    } catch { setError('Gagal terhubung ke server.') }
+      if (d.success) { setMessage('OTP code has been sent to your email.'); setStep('otp') }
+      else setError(d.detail || d.message || 'Email is not registered.')
+    } catch { setError('Failed to connect to the server.') }
     setLoading(false)
   }
 
   async function handleVerifyOtp() {
     reset()
-    if (!code.trim()) { setError('Kode OTP wajib diisi.'); return }
+    if (!code.trim()) { setError('OTP code is required.'); return }
     setLoading(true)
     try {
       const r = await fetch(`${API}/api/auth/verify-otp`, {
@@ -81,14 +81,14 @@ export default function AuthPage() {
         setStep('welcome')
         localStorage.setItem('pitchflow_user', JSON.stringify(d.data))
         if (d.data.token) localStorage.setItem('access_token', d.data.token)
-      } else setError(d.detail || d.message || 'Kode OTP salah.')
-    } catch { setError('Gagal terhubung ke server.') }
+      } else setError(d.detail || d.message || 'Invalid OTP code.')
+    } catch { setError('Failed to connect to the server.') }
     setLoading(false)
   }
 
   async function handleAdminLogin() {
     reset()
-    if (!email.trim() || !password.trim()) { setError('Email dan password wajib diisi.'); return }
+    if (!email.trim() || !password.trim()) { setError('Email and password are required.'); return }
     setLoading(true)
     try {
       const r = await fetch(`${API}/api/auth/admin-login`, {
@@ -102,8 +102,8 @@ export default function AuthPage() {
         localStorage.setItem('pitchflow_user', JSON.stringify(d.data))
         localStorage.setItem('pitchflow_admin', 'true')
         if (d.data.token) localStorage.setItem('access_token', d.data.token)
-      } else setError(d.detail || d.message || 'Login gagal.')
-    } catch { setError('Gagal terhubung ke server.') }
+      } else setError(d.detail || d.message || 'Login failed.')
+    } catch { setError('Failed to connect to the server.') }
     setLoading(false)
   }
 
@@ -113,15 +113,15 @@ export default function AuthPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xl">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-[#0056b3] to-[#003d7a] text-2xl">🎉</div>
-          <h2 className="mt-4 text-xl font-bold">Selamat Datang, {user.name}!</h2>
+          <h2 className="mt-4 text-xl font-bold">Welcome, {user.name}!</h2>
           <p className="mt-2 text-sm text-slate-500">{user.email}</p>
-          <p className="mt-1 text-xs text-slate-400">Login berhasil</p>
+          <p className="mt-1 text-xs text-slate-400">Login successful</p>
           <div className="mt-6 flex flex-col gap-3">
             <Link href="/content-studio" className="rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-5 py-3 text-sm font-semibold text-white text-center hover:brightness-110">
-              Masuk ke Content Studio
+              Go to Content Studio
             </Link>
             <Link href="/" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-600 text-center hover:bg-slate-50">
-              Ke Landing Page
+              Back to Home
             </Link>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function AuthPage() {
         {step !== 'otp' && (
           <div className="mt-6 flex gap-1 rounded-xl bg-slate-100 p-1">
             <button onClick={() => { setTab('register'); reset() }}
-              className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${tab === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>Daftar</button>
+              className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${tab === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>Register</button>
             <button onClick={() => { setTab('login'); reset() }}
               className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${tab === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>Login</button>
           </div>
@@ -157,35 +157,35 @@ export default function AuthPage() {
         {step === 'otp' ? (
           <div className="mt-6 space-y-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Kode OTP</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">OTP Code</label>
               <input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="Masukkan 6 digit kode"
+                placeholder="Enter 6-digit code"
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold outline-none focus:border-blue-400"
                 maxLength={6} />
             </div>
             <button onClick={handleVerifyOtp} disabled={loading || code.length !== 6}
               className="w-full rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50">
-              {loading ? '⏳ Memverifikasi...' : 'Verifikasi'}
+              {loading ? '⏳ Verifying...' : 'Verify'}
             </button>
             <button onClick={() => { setStep(tab === 'admin' ? 'admin' : 'register'); setCode(''); setMessage('') }}
-              className="w-full text-center text-xs text-slate-400 hover:text-slate-600">← Kembali</button>
+              className="w-full text-center text-xs text-slate-400 hover:text-slate-600">← Back</button>
           </div>
         ) : tab === 'register' ? (
           /* Register Form */
           <div className="mt-6 space-y-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Nama</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Name</label>
               <input value={name} onChange={e => setName(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="Nama lengkap" />
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="Full name" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500">Email</label>
               <input value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="email@perusahaan.com" />
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="email@company.com" />
             </div>
             <button onClick={handleRegister} disabled={loading}
               className="w-full rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50">
-              {loading ? '⏳ Mendaftar...' : 'Daftar'}
+              {loading ? '⏳ Registering...' : 'Register'}
             </button>
           </div>
         ) : tab === 'login' ? (
@@ -194,15 +194,15 @@ export default function AuthPage() {
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500">Email</label>
               <input value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="email@perusahaan.com" />
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="email@company.com" />
             </div>
             <button onClick={handleRequestOtp} disabled={loading}
               className="w-full rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50">
-              {loading ? '⏳ Mengirim...' : 'Kirim Kode OTP'}
+              {loading ? '⏳ Sending...' : 'Send OTP Code'}
             </button>
             <div className="relative">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-              <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-slate-400">atau</span></div>
+              <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-slate-400">or</span></div>
             </div>
             <button onClick={() => { setTab('admin'); reset(); setPassword('') }}
               className="w-full rounded-xl border border-slate-300 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50">
@@ -212,9 +212,9 @@ export default function AuthPage() {
         ) : (
           /* Admin Login */
           <div className="mt-6 space-y-4">
-            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-2 text-xs text-amber-700">🔐 Login sebagai Administrator</div>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-2 text-xs text-amber-700">🔐 Signing in as Administrator</div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Email Admin</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Admin Email</label>
               <input value={email} onChange={e => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400" placeholder="admin@pitchflow.com" />
             </div>
@@ -225,10 +225,10 @@ export default function AuthPage() {
             </div>
             <button onClick={handleAdminLogin} disabled={loading}
               className="w-full rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50">
-              {loading ? '⏳ Login...' : 'Login Admin'}
+              {loading ? '⏳ Signing in...' : 'Admin Login'}
             </button>
             <button onClick={() => { setTab('login'); reset() }}
-              className="w-full text-center text-xs text-slate-400 hover:text-slate-600">← Kembali ke Login</button>
+              className="w-full text-center text-xs text-slate-400 hover:text-slate-600">← Back to Login</button>
           </div>
         )}
 +

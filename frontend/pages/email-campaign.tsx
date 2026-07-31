@@ -76,7 +76,7 @@ export default function EmailCampaignRoute() {
 
   // ── Template ──
   async function activateTpl(tid: string) { try { await fetch(`${API}/api/email-campaign/templates/${tid}/activate`,{method:'POST'}); await fetchTemplates() } catch {} }
-  async function deleteTpl(tid: string) { if(!confirm('Hapus template ini?')) return; try { await fetch(`${API}/api/email-campaign/templates/${tid}`,{method:'DELETE'}); await fetchTemplates() } catch {} }
+  async function deleteTpl(tid: string) { if(!confirm('Delete this template?')) return; try { await fetch(`${API}/api/email-campaign/templates/${tid}`,{method:'DELETE'}); await fetchTemplates() } catch {} }
   async function saveTemplate(data: any) {
     if (!data.title) { alert('Please fill in the Template Name'); return }
     const isNew = !data.id
@@ -103,8 +103,8 @@ export default function EmailCampaignRoute() {
     if(selectedIdx.size===0||sending) return
     setSending(true); setSendResult('')
     fetch(`${API}/api/email-campaign/send-selected`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({indices:Array.from(selectedIdx)})})
-      .then(r=>r.json()).then(d=>{setSendResult(d.success?`Terkirim ${d.sent_count}`:`Gagal: ${d.message}`); setSelectedIdx(new Set()); fetchStatus(); fetchContacts(); fetchLog()})
-      .catch(e=>setSendResult(`Gagal: ${e.message}`)).finally(()=>setSending(false))
+      .then(r=>r.json()).then(d=>{setSendResult(d.success?`Sent ${d.sent_count}`:`Failed: ${d.message}`); setSelectedIdx(new Set()); fetchStatus(); fetchContacts(); fetchLog()})
+      .catch(e=>setSendResult(`Failed: ${e.message}`)).finally(()=>setSending(false))
   }
 
   // ── Preview ──
@@ -119,17 +119,17 @@ export default function EmailCampaignRoute() {
   // ── Contact ──
   function openEdit(i:number,c:Contact){setEditIdx(i);setEditName(c.name);setEditEmail(c.email)}
   async function saveEdit() { if(editIdx===null) return; try { await fetch(`${API}/api/email-campaign/contacts/edit`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({index:editIdx,name:editName,email:editEmail})}) } catch {}; setEditIdx(null) }
-  async function deleteContact(email:string){if(!confirm('Hapus kontak ini?'))return; try{await fetch(`${API}/api/email-campaign/contacts/delete-by-email`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});await fetchContacts();await fetchStatus()}catch{}}
+  async function deleteContact(email:string){if(!confirm('Delete this contact?'))return;try{await fetch(`${API}/api/email-campaign/contacts/delete-by-email`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});await fetchContacts();await fetchStatus()}catch{}}
   async function handleUpload(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{const r=await fetch(`${API}/api/email-campaign/upload`,{method:'POST',body:fd});const d=await r.json();if(d.success){setSearchQ('');await fetchContacts('');await fetchStatus()}}catch{}}
-  async function handleScanBounces(){setScanningBounces(true);try{const r=await fetch(`${API}/api/email-campaign/bounces/scan`,{method:'POST'});const d=await r.json();alert(d.message||(d.success?'Bounce scan done':'Scan failed'));if(d.success){await fetchContacts('');await fetchStatus();await fetchLog()}}catch{alert('Gagal terhubung ke server')}setScanningBounces(false)}
+  async function handleScanBounces(){setScanningBounces(true);try{const r=await fetch(`${API}/api/email-campaign/bounces/scan`,{method:'POST'});const d=await r.json();alert(d.message||(d.success?'Bounce scan done':'Scan failed'));if(d.success){await fetchContacts('');await fetchStatus();await fetchLog()}}catch{alert('Failed to connect to the server')}setScanningBounces(false)}
   async function handleAddManual(data:{name:string;email:string;phone:string;job_title:string;company:string}) {
     setAddError('')
     try {
       const r=await fetch(`${API}/api/email-campaign/contacts/manual`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
       const d=await r.json()
       if(d.success){setShowAdd(false);setSearchQ('');await fetchContacts('');await fetchStatus()}
-      else setAddError(d.detail||d.message||'Gagal')
-    } catch { setAddError('Gagal terhubung') }
+      else setAddError(d.detail||d.message||'Failed')
+    } catch { setAddError('Failed to connect') }
   }
 
   // ── Daily Limit ──
@@ -138,13 +138,13 @@ export default function EmailCampaignRoute() {
   // ── Selection ──
   function toggleSelect(i:number){
     const c = contacts[i]
-    // Jangan izinkan pilih kontak yang sudah terkirim, bounced, atau unsubscribed, kecuali test email
+    // Don't allow selecting sent, bounced, or unsubscribed contacts (except test emails)
     if((c?.status === 'sent' || c?.status === 'bounced' || c?.status === 'unsubscribed') && !TEST_EMAILS.has(c.email)) return
     setSelectedIdx(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})
   }
   function selectAll(){
     const limit=Math.min(status?.daily_limit||contacts.length, contacts.length)
-    // Hanya hitung kontak pending (belum terkirim) + test email dalam range limit
+    // Only count pending contacts (not yet sent) + test emails within limit range
     const pendingIndices = contacts.slice(0, limit).reduce<number[]>((acc, c, i) => {
       if(c.status !== 'sent' || TEST_EMAILS.has(c.email)) acc.push(i)
       return acc

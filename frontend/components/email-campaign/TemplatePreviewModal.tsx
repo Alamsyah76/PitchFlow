@@ -25,9 +25,9 @@ export default function TemplatePreviewModal({ open, tpl, onClose, onEdit, API }
       .then(r => r.json())
       .then(d => {
         if (d.success) { setHtml(d.data.html); setSubject(d.data.subject) }
-        else setHtml('<p class="text-slate-400 p-8">Preview tidak tersedia. Pastikan ada kontak di Audience.</p>')
+        else setHtml('<p class="text-slate-400 p-8">Preview unavailable. Make sure there is a contact in the Audience.</p>')
       })
-      .catch(() => setHtml('<p class="text-slate-400 p-8">Gagal memuat preview.</p>'))
+      .catch(() => setHtml('<p class="text-slate-400 p-8">Failed to load preview.</p>'))
       .finally(() => setLoading(false))
   }, [open, tpl?.id])
 
@@ -65,7 +65,7 @@ export default function TemplatePreviewModal({ open, tpl, onClose, onEdit, API }
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-3">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-              <p className="text-sm text-slate-400">Memuat preview...</p>
+              <p className="text-sm text-slate-400">Loading preview...</p>
             </div>
           ) : (
             <iframe srcDoc={html} className="w-full" style={{height:'70vh',border:'none'}} title="Template Preview" />

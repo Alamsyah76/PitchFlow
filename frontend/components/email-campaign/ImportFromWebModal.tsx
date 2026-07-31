@@ -37,7 +37,7 @@ export default function ImportFromWebModal({ show, onClose, onImport }: Props) {
       const r = await fetch(`${API}/api/email-campaign/scrape/products`)
       const d = await r.json()
       if (d.success) setProducts(d.data.products)
-    } catch { setError('Gagal memuat produk') }
+    } catch { setError('Failed to load products') }
     setLoading(false)
   }
 
@@ -64,7 +64,7 @@ export default function ImportFromWebModal({ show, onClose, onImport }: Props) {
       })
       const d = await r.json()
       if (d.success) setPreview(d.data)
-      else setError(d.detail || 'Gagal memuat konten')
+      else setError(d.detail || 'Failed to load content')
     } catch { setError('Network error') }
     setPreviewLoading(false)
   }
@@ -149,7 +149,7 @@ export default function ImportFromWebModal({ show, onClose, onImport }: Props) {
           {previewLoading && (
             <div className="mt-4 flex items-center justify-center py-8">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#0056b3] border-t-transparent" />
-              <span className="ml-2 text-sm text-slate-500">Memuat konten...</span>
+              <span className="ml-2 text-sm text-slate-500">Loading content...</span>
             </div>
           )}
 
@@ -168,7 +168,7 @@ export default function ImportFromWebModal({ show, onClose, onImport }: Props) {
         <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4">
           <button onClick={onClose} type="button"
             className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50">
-            Batal
+            Cancel
           </button>
           <button onClick={doImport} disabled={!preview} type="button"
             className="rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed">

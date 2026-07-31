@@ -27,8 +27,8 @@ export default function AddContactModal({ open, onClose, onAdd, error }: Props) 
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Tambah Kontak</h3>
-            <p className="mt-0.5 text-xs text-slate-500">Masukkan data kontak baru</p>
+            <h3 className="text-base font-semibold text-slate-900">Add Contact</h3>
+            <p className="mt-0.5 text-xs text-slate-500">Enter new contact details</p>
           </div>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 text-slate-400 hover:bg-slate-100 transition-colors">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -45,10 +45,10 @@ export default function AddContactModal({ open, onClose, onAdd, error }: Props) 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">Nama <span className="text-red-400">*</span></label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-600">Name <span className="text-red-400">*</span></label>
               <input name="name" required
                 className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-400 focus:bg-white focus:outline-none"
-                placeholder="Nama lengkap" />
+                placeholder="Full name" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-slate-600">Email <span className="text-red-400">*</span></label>
@@ -75,19 +75,19 @@ export default function AddContactModal({ open, onClose, onAdd, error }: Props) 
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">Perusahaan</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-600">Company</label>
             <input name="company"
               className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-400 focus:bg-white focus:outline-none"
-              placeholder="Nama perusahaan" />
+              placeholder="Company name" />
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50">Batal</button>
+              className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50">Cancel</button>
             <button type="submit"
               className="rounded-xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md hover:brightness-110 active:scale-[0.97]">
               <span className="flex items-center gap-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Tambah Kontak
+                Add Contact
               </span>
             </button>
           </div>

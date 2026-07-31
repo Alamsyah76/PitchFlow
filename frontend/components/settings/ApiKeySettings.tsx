@@ -43,8 +43,8 @@ export default function ApiKeySettings() {
 
   async function handleSave() {
     setMessage(''); setError('')
-    if (!apiKey.trim()) { setError('API Key tidak boleh kosong'); return }
-    if (!apiKey.trim().startsWith('sk-')) { setError('API Key harus dimulai dengan "sk-"'); return }
+    if (!apiKey.trim()) { setError('API Key cannot be empty'); return }
+    if (!apiKey.trim().startsWith('sk-')) { setError('API Key must start with "sk-"'); return }
     setLoading(true)
     try {
       const r = await fetch(`${API}/api/profile/save-api-key`, {

@@ -52,7 +52,7 @@ export default function TemplateEditorModal({ open, tpl, onSave, onClose, sender
       if (d.success) {
         setAttachments(prev => [...prev, d.data])
       } else alert(d.detail || 'Upload failed')
-    } catch { alert('Upload gagal') }
+    } catch { alert('Upload failed') }
     setUploading(false)
     if (fileRef.current) fileRef.current.value = ''
   }
@@ -63,7 +63,7 @@ export default function TemplateEditorModal({ open, tpl, onSave, onClose, sender
       const r = await fetch(`${API}/api/email-campaign/templates/${tid}/attachments/${filename}`, { method: 'DELETE' })
       const d = await r.json()
       if (d.success) setAttachments(prev => prev.filter(a => a.filename !== filename))
-    } catch { alert('Hapus gagal') }
+    } catch { alert('Delete failed') }
   }
 
   const formatSize = (bytes: number) => {
@@ -126,7 +126,7 @@ export default function TemplateEditorModal({ open, tpl, onSave, onClose, sender
 <div class="wrap">
   ${logo ? `<div class="hd"><img src="data:image/png;base64,${logo}" style="max-height:50px" /></div>` : ''}
   <div class="bd">
-    <p class="greeting">Kepada Yth. Bapak/Ibu <strong>Nama Kontak</strong>${senderCfg?.company ? ',<br>'+senderCfg.company : ''}</p>
+    <p class="greeting">Dear Mr/Ms <strong>Contact Name</strong>${senderCfg?.company ? ',<br>'+senderCfg.company : ''}</p>
     <div style="font-size:12px;color:#999;padding:8px 12px;background:#f9f9f9;border-radius:6px;margin-bottom:16px">Subject: ${subject || '<span style="color:#ccc">[not set]</span>'}</div>
     ${intro ? '<div class="intro-box">'+intro+'</div>' : ''}
     ${body ? '<div>'+body+'</div>' : '<div style="padding:20px;text-align:center;color:#ccc;border:1px dashed #ddd;border-radius:6px;font-size:13px">Content area — start typing</div>'}

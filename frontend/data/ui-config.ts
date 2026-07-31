@@ -9,7 +9,7 @@ export const uiConfig = {
       text: 'PitchFlow'
     },
     menu: [
-      { label: 'Beranda', icon: 'home', route: '/' },
+      { label: 'Home', icon: 'home', route: '/' },
       { label: 'Dashboard', icon: 'layout-dashboard', route: '/dashboard' },
       { label: 'Content Studio', icon: 'sparkles', route: '/content-studio', active: true },
       { label: 'Email Campaign', icon: 'mail', route: '/email-campaign' },
