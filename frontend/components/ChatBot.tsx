@@ -9,7 +9,7 @@ type Message = { role: 'user' | 'bot'; text: string }
 export default function ChatBot() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', text: 'Halo! Ada yang bisa saya bantu tentang PitchFlow?' }
+    { role: 'bot', text: 'Hello! How can I help you with PitchFlow?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,10 +33,10 @@ export default function ChatBot() {
       if (json.success) {
         setMessages(prev => [...prev, { role: 'bot', text: json.data.reply }])
       } else {
-        setMessages(prev => [...prev, { role: 'bot', text: json.message || 'Maaf, terjadi kesalahan.' }])
+        setMessages(prev => [...prev, { role: 'bot', text: json.message || 'Sorry, something went wrong.' }])
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'bot', text: 'Gagal terhubung ke server.' }])
+      setMessages(prev => [...prev, { role: 'bot', text: 'Failed to connect to the server.' }])
     }
     setLoading(false)
   }
@@ -47,7 +47,7 @@ export default function ChatBot() {
       {!open && (
         <button onClick={() => setOpen(true)}
           className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-lg hover:brightness-110 transition-all"
-          title="Tanya PitchFlow">
+          title="Ask PitchFlow">
           <img src="/pitchflow.png" alt="Chat" className="h-full w-full object-cover" />
         </button>
       )}
@@ -103,7 +103,7 @@ export default function ChatBot() {
             <div className="flex gap-2">
               <input value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
-                placeholder="Tanya sesuatu..."
+                placeholder="Ask something..."
                 className="flex-1 rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-blue-400"
               />
               <button onClick={handleSend} disabled={loading || !input.trim()}

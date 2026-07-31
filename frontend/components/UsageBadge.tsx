@@ -33,7 +33,7 @@ export default function UsageBadge() {
         <div className="flex items-center gap-2">
           <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase ${color}`}>{data.tier_label}</span>
           {data.konten.limit !== null && (
-            <span className="text-slate-500">Konten {data.konten.used}/{data.konten.limit}</span>
+            <span className="text-slate-500">Content {data.konten.used}/{data.konten.limit}</span>
           )}
           {data.chat.limit !== null && (
             <span className="text-slate-500">· Chat {data.chat.used}/{data.chat.limit}</span>
