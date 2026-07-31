@@ -31,9 +31,16 @@ async def preview_contacts(limit: int = 20, q: str = ""):
             from modules.log_store import load_bounced
             bounced = load_bounced()
         except: pass
+        unsub = set()
+        try:
+            from modules.unsubscribe_store import unsubscribed_set
+            unsub = unsubscribed_set()
+        except: pass
 
         def _status(c):
             e = c.get("email", "").strip().lower()
+            if e in unsub:
+                return "unsubscribed"
             if e in bounced:
                 return "bounced"
             return "sent" if e in sent_log else "pending"

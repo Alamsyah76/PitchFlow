@@ -26,6 +26,7 @@ interface Summary {
   total_contacts: number; pending: number; blog_posts_sent: number
   total_bounced?: number; bounce_rate?: number
   total_clicks?: number; unique_clicks?: number; ctr?: number
+  total_unsubscribed?: number
   last_checked: string
 }
 
@@ -206,7 +207,7 @@ export default function DashboardRoute() {
           </div>
 
           {/* Audience summary strip */}
-          <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <span className="absolute left-0 top-0 h-full w-1 bg-slate-400" />
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Total Contacts</p>
@@ -237,6 +238,14 @@ export default function DashboardRoute() {
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-xl font-bold text-rose-600">{fmt((summary?.total_failed || 0) + (summary?.total_bounced || 0))}</span>
                 <span className="text-xs text-slate-400">undeliverable</span>
+              </div>
+            </div>
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <span className="absolute left-0 top-0 h-full w-1 bg-slate-500" />
+              <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Unsubscribed</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-slate-700">{fmt(summary?.total_unsubscribed || 0)}</span>
+                <span className="text-xs text-slate-400">opted out</span>
               </div>
             </div>
           </div>

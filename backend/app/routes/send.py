@@ -131,6 +131,20 @@ def _send_to_contacts(selected, smtp_config, sender):
         # Click tracking — rewrite all <a href> links
         html = _wrap_links(html, track_url, contact["email"], active_tid)
 
+        # Unsubscribe footer (English) — HMAC-protected link
+        try:
+            from modules.unsubscribe_store import make_token
+            unsub_link = f"{track_url}/api/email-campaign/unsubscribe?email={contact['email']}&token={make_token(contact['email'])}"
+            unsub_footer = (
+                f'<div style="text-align:center;font-size:11px;color:#94a3b8;padding:16px 20px;border-top:1px solid #e8e8e8;margin-top:20px">'
+                f'You are receiving this email because your contact was added to our mailing list.<br/>'
+                f'<a href="{unsub_link}" style="color:#0056b3;text-decoration:underline">Unsubscribe</a> from future emails.'
+                f'</div>'
+            )
+            html = html.replace("</body>", f"{unsub_footer}</body>") if "</body>" in html else html + unsub_footer
+        except Exception:
+            pass
+
         ok, err = send_email(smtp_config, contact["email"], contact["name"], html,
                              subject=tpl_subject, attachments=attachments or None, cc_email=tpl_cc)
         if ok:
@@ -154,12 +168,17 @@ async def send_selected(payload: SendSelectedRequest):
         # Gunakan get_all_contacts() (full list, sama dengan frontend)
         all_c = get_all_contacts()
         sent_set = load_log()
+        from modules.unsubscribe_store import unsubscribed_set
+        unsub_set = unsubscribed_set()
 
         selected = []
         for idx in payload.indices:
             if 0 <= idx < len(all_c):
                 contact = all_c[idx]
                 email_lower = contact["email"].strip().lower()
+                # Skip: sudah dikirim / sudah unsubscribe (kecuali test email)
+                if email_lower in unsub_set and email_lower not in TEST_EMAIL_LOWER:
+                    continue
                 if email_lower not in sent_set or email_lower in TEST_EMAIL_LOWER:
                     selected.append(contact)
 

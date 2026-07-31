@@ -53,7 +53,7 @@ export default function EmailCampaignRoute() {
   const [viewTpl, setViewTpl] = useState<any>(null)
   const [showTplPreview, setShowTplPreview] = useState(false)
   const [senderCfg, setSenderCfg] = useState<any>({name:'',email:'',company:'',logo_b64:''})
-  const [filter, setFilter] = useState<'all' | 'pending' | 'sent' | 'bounced'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'sent' | 'bounced' | 'unsubscribed'>('all')
   const [scanningBounces, setScanningBounces] = useState(false)
   const searchTimer = useRef<NodeJS.Timeout|null>(null)
 
@@ -138,8 +138,8 @@ export default function EmailCampaignRoute() {
   // ── Selection ──
   function toggleSelect(i:number){
     const c = contacts[i]
-    // Jangan izinkan pilih kontak yang sudah terkirim, kecuali test email
-    if(c?.status === 'sent' && !TEST_EMAILS.has(c.email)) return
+    // Jangan izinkan pilih kontak yang sudah terkirim, bounced, atau unsubscribed, kecuali test email
+    if((c?.status === 'sent' || c?.status === 'bounced' || c?.status === 'unsubscribed') && !TEST_EMAILS.has(c.email)) return
     setSelectedIdx(p=>{const n=new Set(p);n.has(i)?n.delete(i):n.add(i);return n})
   }
   function selectAll(){

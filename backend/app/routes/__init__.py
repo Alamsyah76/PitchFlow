@@ -102,6 +102,7 @@ from .tracking import router as tracking_router
 from .daily_report import router as daily_report_router
 from .report import router as report_router
 from .bounces import router as bounces_router
+from .unsubscribe import router as unsubscribe_router
 
 router.include_router(status_router)
 router.include_router(templates_router)
@@ -116,3 +117,4 @@ router.include_router(tracking_router)
 router.include_router(daily_report_router)
 router.include_router(report_router)
 router.include_router(bounces_router)
+router.include_router(unsubscribe_router)

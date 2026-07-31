@@ -77,6 +77,13 @@ async def report_summary():
         # Blog monitor
         blog = get_status()
 
+        # Unsubscribes
+        try:
+            from modules.unsubscribe_store import unsubscribed_set
+            total_unsubscribed = len(unsubscribed_set())
+        except Exception:
+            total_unsubscribed = 0
+
         # Contacts — gunakan valid emails supaya konsisten dengan status endpoint
         from modules.queries import get_campaign_stats as _stats
         campaign = _stats()
@@ -100,6 +107,7 @@ async def report_summary():
                 "total_clicks": total_clicks,
                 "unique_clicks": unique_clicks,
                 "ctr": ctr,
+                "total_unsubscribed": total_unsubscribed,
                 "total_contacts": total_contacts,
                 "pending": pending,
                 "blog_posts_sent": blog.get("total_sent", 0),
