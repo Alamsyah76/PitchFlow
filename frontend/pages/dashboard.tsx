@@ -109,7 +109,7 @@ export default function DashboardRoute() {
     <AppShell activeRoute="/dashboard">
       <div className="mx-auto max-w-7xl space-y-6 p-6">
         {/* ── Header Hero ── */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0056b3] via-[#0a66c9] to-[#4C3FD8] p-6 text-white shadow-[0_8px_30px_rgba(0,86,179,0.25)]">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0056b3] to-[#003d7a] p-6 text-white shadow-[0_8px_30px_rgba(0,86,179,0.25)]">
           <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
           <div className="absolute right-24 -bottom-10 h-32 w-32 rounded-full bg-white/10 blur-xl" />
           <div className="relative flex flex-wrap items-center justify-between gap-4">
@@ -470,7 +470,7 @@ function ChartCard({ title, subtitle, children, className = '' }: {
   return (
     <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
       <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-3.5">
-        <span className="h-8 w-1 rounded-full bg-gradient-to-b from-[#0056b3] to-[#4C3FD8]" />
+        <span className="h-8 w-1 rounded-full bg-gradient-to-b from-[#0056b3] to-[#003d7a]" />
         <div>
           <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
           {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
